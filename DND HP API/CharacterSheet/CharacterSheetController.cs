@@ -1,18 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+
+using Microsoft.AspNetCore.Mvc;
 
 namespace DND_HP_API.CharacterSheet;
 
-public class CharacterSheetController: ControllerBase
+[ApiController]
+[Route("[controller]")]
+public class CharacterSheetController: Controller
 {
-    private List<string> _characterSheets = [];
-    [HttpGet]
-    public ActionResult<ICollection<string>> GetCharacterSheet()
+    private readonly List<CharacterSheetModel> _characterSheets = [];
+    
+    [HttpGet()]
+    public ActionResult<ICollection<CharacterSheetModel>> GetCharacterSheet()
     {
         return Ok(_characterSheets);
     }
     
     [HttpGet("{id}")]
-    public ActionResult<string> GetCharacterSheet(int id)
+    public ActionResult<CharacterSheetModel> GetCharacterSheet(int id)
     {
         if (id < 0 || id >= _characterSheets.Count)
         {
@@ -20,10 +25,9 @@ public class CharacterSheetController: ControllerBase
         }
         return Ok(_characterSheets[id]);
     }
-    [HttpPost]
-    public ActionResult PostCharacterSheet(string characterSheet)
+    [HttpPost()]
+    public ActionResult PostCharacterSheet(CharacterSheetModel characterSheet)
     {
-        
         _characterSheets.Add(characterSheet);
         return Ok();
     }

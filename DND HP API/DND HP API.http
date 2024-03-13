@@ -7,3 +7,22 @@ Accept: application/json
 
 GET {{DND_HP_API_HostAddress}}/HpCalculator
 Accept: application/json
+
+###
+
+GET {{DND_HP_API_HostAddress}}/CharacterSheet
+Accept: application/json
+
+###
+
+GET {{DND_HP_API_HostAddress}}/CharacterSheet/1
+Accept: application/json
+
+###
+
+POST {{DND_HP_API_HostAddress}}/CharacterSheet
+Content-Type: application/json
+
+{
+  "name":""
+}
