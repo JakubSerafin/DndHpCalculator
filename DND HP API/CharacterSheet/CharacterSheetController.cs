@@ -20,7 +20,7 @@ public class CharacterSheetController : Controller
     {
         var models = _characterSheetRepository.GetAll();
         var viewModels = models.Select(CharacterSheetModel.BuildFromEntity);
-        return Ok();
+        return Ok(viewModels);
     }
 
     [HttpGet("{id}")]

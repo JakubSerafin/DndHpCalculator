@@ -2,6 +2,7 @@
 using System.Text;
 using DND_HP_API.HpCalculator;
 using FluentAssertions;
+using FluentAssertions.Equivalency;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -17,10 +18,18 @@ public static class HttpHelpers
 public static class HttpAssertions
 {
    
-    public static async void AssertResponseContent(HttpResponseMessage response, string expectedContent)
+    public static async Task AssertResponseContent(HttpResponseMessage response, string expectedContent)
     {
         var responseString = await response.Content.ReadAsStringAsync();
         responseString.Should().Be(expectedContent);
+    }
+
+    public static async Task AssertResponseJsonContent<T>(HttpResponseMessage response, T expectedContent,
+        Func<EquivalencyAssertionOptions<T>, EquivalencyAssertionOptions<T>>? config = null)
+    {
+        var responseString = await response.Content.ReadAsStringAsync();
+        var responseObject = JsonConvert.DeserializeObject<T>(responseString);
+        responseObject.Should().BeEquivalentTo(expectedContent, config?? (x => x));
     }
 }
 

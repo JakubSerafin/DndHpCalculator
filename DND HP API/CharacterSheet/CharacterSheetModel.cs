@@ -11,7 +11,7 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
     public int HitPoints { get; set; } // Public property for hit points
     public int CurrentHitPoints { get; set; } // CalculatedProperty of the character's current hit points
     public ClassModel[] Classes { get; set; } // Array of "Class" objects for multiple classes
-    public StatsModel StatsModel { get; set; } // Holds the character's statistics
+    public StatsModel Stats { get; set; } // Holds the character's statistics
     public ItemModel[]? Items { get; set; } // Array to hold the character's items
     public DefenseModel[]? Defenses { get; set; } // Array of "Defense" objects
     
@@ -24,7 +24,7 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
             Level = arg.Level,
             HitPoints = arg.HitPoints,
             Classes = arg.Classes.Select(ClassModel.FromDomainEntity).ToArray(),
-            StatsModel =  new StatsModel
+            Stats =  new StatsModel
             {
                 Strength = arg.Stats.Strength,
                 Dexterity = arg.Stats.Dexterity,
@@ -55,27 +55,27 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
             }).ToArray(),
             Stats = new Domain.Stats
             {
-                Strength = StatsModel.Strength,
-                Dexterity = StatsModel.Dexterity,
-                Constitution = StatsModel.Constitution,
-                Intelligence = StatsModel.Intelligence,
-                Wisdom = StatsModel.Wisdom,
-                Charisma = StatsModel.Charisma
+                Strength = Stats.Strength,
+                Dexterity = Stats.Dexterity,
+                Constitution = Stats.Constitution,
+                Intelligence = Stats.Intelligence,
+                Wisdom = Stats.Wisdom,
+                Charisma = Stats.Charisma
             },
             Items = Items?.Select(x => new Domain.Item
             {
                 Name = x.Name,
                 ModifierModel = new Domain.Modifier
                 {
-                    AffectedObject = x.ModifierModel.AffectedObject,
-                    AffectedValue = x.ModifierModel.AffectedValue,
-                    Value = x.ModifierModel.Value
+                    AffectedObject = x.Modifier.AffectedObject,
+                    AffectedValue = x.Modifier.AffectedValue,
+                    Value = x.Modifier.Value
                 }
             }).ToArray(),
             Defenses = Defenses?.Select(x => new Domain.Defence
             {
-                Type = Enum.Parse<DamageType>(x.DamageType),
-                Defense = Enum.Parse<DefenceType>(x.DefenseType)
+                Type = DamageMapper.MapDamageType(x.DamageType),
+                Defense = DamageMapper.MapDefenceType(x.DefenseType)
             }).ToArray()
         };
     }
@@ -111,14 +111,14 @@ public class StatsModel
 public class ItemModel 
 {
     public string Name { get; set; }
-    public ModifierModel ModifierModel { get; set; } 
+    public ModifierModel Modifier { get; set; } 
     
     internal static ItemModel FromDomainEntity(Item arg)
     {
         return new ItemModel
         {
             Name = arg.Name,
-            ModifierModel = ModifierModel.FromDomainEntity(arg.ModifierModel)
+            Modifier = ModifierModel.FromDomainEntity(arg.ModifierModel)
         };
     }
 }

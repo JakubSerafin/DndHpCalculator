@@ -14,12 +14,14 @@ public class CharacterSheetApiTests
 {
     private readonly HttpClient _client;
     private readonly string _characterSheetJson = File.ReadAllText("Data/briv.json");
+    private readonly CharacterSheetModel _characterSheet;
     private const string CharacterSheetEndpoint = "/CharacterSheet";
 
     public CharacterSheetApiTests(ITestOutputHelper testOutputHelper)
     {
         var factory = new CustomWebApplicationFactor();
         _client = factory.CreateClient();
+        _characterSheet = JsonConvert.DeserializeObject<CharacterSheetModel>(_characterSheetJson)!;
     }
 
     [Fact]
@@ -28,7 +30,7 @@ public class CharacterSheetApiTests
         var characterSheet = JsonConvert.DeserializeObject<CharacterSheetModel>(_characterSheetJson);
         // POST new character sheet
         var postResponse = await _client.PostAsync(CharacterSheetEndpoint, HttpHelpers.Encode(_characterSheetJson));
-        postResponse.Should().BeSuccessful();
+        postResponse.Should().BeSuccessful(await _responseContent(postResponse));
 
         // GET should return the character sheet
         var getResponse = await _client.GetAsync(CharacterSheetEndpoint);
@@ -45,7 +47,7 @@ public class CharacterSheetApiTests
     {
         var response = await _client.GetAsync(CharacterSheetEndpoint);
         response.Should().BeSuccessful();
-        HttpAssertions.AssertResponseContent(response, "[]");
+        await HttpAssertions.AssertResponseContent(response, "[]");
     }
     
     [Fact]
@@ -65,7 +67,8 @@ public class CharacterSheetApiTests
         //Get should return the character sheet
         var getResponse = await _client.GetAsync(CharacterSheetEndpoint + "/1");
         getResponse.Should().BeSuccessful();
-        HttpAssertions.AssertResponseContent(getResponse, _characterSheetJson);
+        await HttpAssertions.AssertResponseJsonContent<CharacterSheetModel>(getResponse, _characterSheet,
+            options => options.Excluding(x => x.Id));
     }
     
     [Fact]
