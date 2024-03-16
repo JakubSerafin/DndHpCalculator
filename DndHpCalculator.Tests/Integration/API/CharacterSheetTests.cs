@@ -1,79 +1,84 @@
-﻿using DND_HP_API.CharacterSheet;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using System.Net;
+using System.Text;
+using DND_HP_API.CharacterSheet;
+using DndHpCalculator.Tests.Integration.API.Helpers;
+using FluentAssertions;
+using FluentAssertions.Json;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Xunit.Abstractions;
 
 namespace DndHpCalculator.Tests.Integration.API;
 
 public class CharacterSheetApiTests
 {
-
-    private readonly CharacterSheetController _endpoint;
-    // load content of briv.json
+    private readonly HttpClient _client;
     private readonly string _characterSheetJson = File.ReadAllText("Data/briv.json");
-    private readonly CharacterSheetModel _characterSheet;
-    public CharacterSheetApiTests()
-    {
+    private const string CharacterSheetEndpoint = "/CharacterSheet";
 
-        _endpoint = new CharacterSheetController();
-        _characterSheet = JsonConvert.DeserializeObject<CharacterSheetModel>(_characterSheetJson)!;
+    public CharacterSheetApiTests(ITestOutputHelper testOutputHelper)
+    {
+        var factory = new CustomWebApplicationFactor();
+        _client = factory.CreateClient();
     }
 
+    [Fact]
+    public async Task POST_ShouldUploadAndValidateCharacterSheet()
+    {
+        var characterSheet = JsonConvert.DeserializeObject<CharacterSheetModel>(_characterSheetJson);
+        // POST new character sheet
+        var postResponse = await _client.PostAsync(CharacterSheetEndpoint, HttpHelpers.Encode(_characterSheetJson));
+        postResponse.Should().BeSuccessful();
+
+        // GET should return the character sheet
+        var getResponse = await _client.GetAsync(CharacterSheetEndpoint);
+        postResponse.Should().BeSuccessful();
+
+        var responseObject = JsonConvert.DeserializeObject<List<CharacterSheetModel>>(await _responseContent(getResponse));
+        responseObject.Should().HaveCount(1)
+            .And.ContainEquivalentOf(characterSheet, options => options.Excluding(x => x.Id));
+    }
+    
     
     [Fact]
-    public void POST_ShouldUploadAndValidateCharacterSheet()
+    public async void GET_NoCharacterSheetShouldReturnEmptyList()
     {
-        //Get should return nothing, as there is no character sheet yet 
-         var response  = _endpoint.GetCharacterSheet();
-         HttpAssertions.AssertOkResult<ICollection<string>>(
-             response.Result!, 
-             Assert.Empty!);
-         
-        //POST new character sheet
-        _endpoint.PostCharacterSheet(_characterSheet);
-        
-        //Get should return the character sheet
-        response = _endpoint.GetCharacterSheet();
-        HttpAssertions.AssertOkResult<ICollection<string>>(
-            response.Result!, 
-            result => Assert.Contains(_characterSheetJson, result!));
+        var response = await _client.GetAsync(CharacterSheetEndpoint);
+        response.Should().BeSuccessful();
+        HttpAssertions.AssertResponseContent(response, "[]");
     }
     
     [Fact]
-    public void GET_NoCharacterSheetShouldReturnEmptyList()
+    public async void POST_InvalidCharacterSheetShouldReturnBadRequest()
     {
-        var response = _endpoint.GetCharacterSheet();
-        HttpAssertions.AssertOkResult<ICollection<string>>(
-            response.Result!, 
-            Assert.Empty!);
+        var content = new StringContent("{}", Encoding.UTF8, "application/json");
+        var response = await _client.PostAsync(CharacterSheetEndpoint,content);
+        response.Should().HaveStatusCode(HttpStatusCode.BadRequest);
     }
     
     [Fact]
-    public void POST_InvalidCharacterSheetShouldReturnBadRequest()
-    {
-        var response = _endpoint.PostCharacterSheet(new CharacterSheetModel());
-        Assert.IsType<BadRequestResult>(response);
-    }
-    
-    [Fact]
-    public void GET_WithExistingId_ShouldReturnCharacterSheet()
+    public async void GET_WithExistingId_ShouldReturnCharacterSheet()
     {
         //POST new character sheet
-        _endpoint.PostCharacterSheet(_characterSheet);
+        var postResponse = await _client.PostAsync(CharacterSheetEndpoint, HttpHelpers.Encode(_characterSheetJson));
         
         //Get should return the character sheet
-        var response = _endpoint.GetCharacterSheet(1);
-        HttpAssertions.AssertOkResult<ICollection<string>>(
-            response.Result!, 
-            result => Assert.Contains(_characterSheetJson, result!));
+        var getResponse = await _client.GetAsync(CharacterSheetEndpoint + "/1");
+        getResponse.Should().BeSuccessful();
+        HttpAssertions.AssertResponseContent(getResponse, _characterSheetJson);
     }
     
     [Fact]
-    public void GET_WithNonExistingId_ShouldReturnNotFound()
+    public async void GET_WithNonExistingId_ShouldReturnNotFound()
     {
-        var response = _endpoint.GetCharacterSheet(1);
-        HttpAssertions.AssertNotFound(response.Result!);
+        var getResponse = await _client.GetAsync(CharacterSheetEndpoint + "/1");
+        getResponse.Should().HaveStatusCode(HttpStatusCode.NotFound);
     }
+    
+
+    
+    // a little syntax sugar
+    private static async Task<string> _responseContent(HttpResponseMessage response) => await response.Content.ReadAsStringAsync();
     
     
 }

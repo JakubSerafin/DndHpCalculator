@@ -1,24 +1,104 @@
-﻿namespace DND_HP_API.CharacterSheet;
+﻿using System.Text.Json.Serialization;
+using DND_HP_API.Domain;
 
-public class CharacterSheetModel // In English, "Character" is the equivalent of "Postać"
-{
-    public string Name { get; set; } // Public property to store the character's name
+namespace DND_HP_API.CharacterSheet;
+
+public class CharacterSheetModel// In English, "Character" is the equivalent of "Postać"
+{ 
+    public int? Id { get; set; } // Public property to store the character's ID
+    public required string Name { get; set; } // Public property to store the character's name
     public int Level { get; set; } // Public property for the character's level 
     public int HitPoints { get; set; } // Public property for hit points
-    public Class[] Classes { get; set; } // Array of "Class" objects for multiple classes
-    public Stats Stats { get; set; } // Holds the character's statistics
-    public Item[] Items { get; set; } // Array to hold the character's items
-    public Defense[] Defenses { get; set; } // Array of "Defense" objects
+    public int CurrentHitPoints { get; set; } // CalculatedProperty of the character's current hit points
+    public ClassModel[] Classes { get; set; } // Array of "Class" objects for multiple classes
+    public StatsModel StatsModel { get; set; } // Holds the character's statistics
+    public ItemModel[]? Items { get; set; } // Array to hold the character's items
+    public DefenseModel[]? Defenses { get; set; } // Array of "Defense" objects
+    
+    internal static CharacterSheetModel BuildFromEntity(Domain.CharacterSheet arg)
+    {
+        return new CharacterSheetModel
+        {
+            Id = arg.Id,
+            Name = arg.Name,
+            Level = arg.Level,
+            HitPoints = arg.HitPoints,
+            Classes = arg.Classes.Select(ClassModel.FromDomainEntity).ToArray(),
+            StatsModel =  new StatsModel
+            {
+                Strength = arg.Stats.Strength,
+                Dexterity = arg.Stats.Dexterity,
+                Constitution = arg.Stats.Constitution,
+                Intelligence = arg.Stats.Intelligence,
+                Wisdom = arg.Stats.Wisdom,
+                Charisma = arg.Stats.Charisma
+            },
+            Items = arg.Items?.Select(ItemModel.FromDomainEntity).ToArray()??[],
+            Defenses = arg.Defenses?.Select(DefenseModel.FromDomainEntity).ToArray()??[]
+        };
+    }
+
+    internal Domain.CharacterSheet ToDomainEntity()
+    {
+        return new Domain.CharacterSheet
+        {
+            //TODO: It should be resolved somehow diffrent, maybe repository should be responsible for creating new Ids based on DTO? 
+            Id = Id??0,
+            Name = Name,
+            Level = Level,
+            HitPoints = HitPoints,
+            Classes = Classes.Select(x => new Domain.CharacterClass
+            {
+                Name = x.Name,
+                HitDiceValue = x.HitDiceValue,
+                ClassLevel = x.ClassLevel
+            }).ToArray(),
+            Stats = new Domain.Stats
+            {
+                Strength = StatsModel.Strength,
+                Dexterity = StatsModel.Dexterity,
+                Constitution = StatsModel.Constitution,
+                Intelligence = StatsModel.Intelligence,
+                Wisdom = StatsModel.Wisdom,
+                Charisma = StatsModel.Charisma
+            },
+            Items = Items?.Select(x => new Domain.Item
+            {
+                Name = x.Name,
+                ModifierModel = new Domain.Modifier
+                {
+                    AffectedObject = x.ModifierModel.AffectedObject,
+                    AffectedValue = x.ModifierModel.AffectedValue,
+                    Value = x.ModifierModel.Value
+                }
+            }).ToArray(),
+            Defenses = Defenses?.Select(x => new Domain.Defence
+            {
+                Type = Enum.Parse<DamageType>(x.DamageType),
+                Defense = Enum.Parse<DefenceType>(x.DefenseType)
+            }).ToArray()
+        };
+    }
 }
 
-public class Class 
+public class ClassModel 
 {
     public string Name { get; set; } 
     public int HitDiceValue { get; set; }
-    public int ClassLevel { get; set; } 
+    public int ClassLevel { get; set; }
+
+    internal static ClassModel FromDomainEntity(CharacterClass arg)
+    {
+        return new ClassModel
+        {
+            Name = arg.Name,
+            HitDiceValue = arg.HitDiceValue,
+            ClassLevel = arg.ClassLevel
+        };
+    }
 }
 
-public class Stats
+public class StatsModel
 {
     public int Strength { get; set; } 
     public int Dexterity { get; set; }
@@ -28,21 +108,51 @@ public class Stats
     public int Charisma { get; set; }
 }
 
-public class Item 
+public class ItemModel 
 {
     public string Name { get; set; }
-    public Modifier Modifier { get; set; } 
+    public ModifierModel ModifierModel { get; set; } 
+    
+    internal static ItemModel FromDomainEntity(Item arg)
+    {
+        return new ItemModel
+        {
+            Name = arg.Name,
+            ModifierModel = ModifierModel.FromDomainEntity(arg.ModifierModel)
+        };
+    }
 }
 
-public class Modifier
+public class ModifierModel
 {
     public string AffectedObject { get; set; } // What the modifier affects (e.g., stats)
     public string AffectedValue { get; set; } // Specific property to change (e.g., constitution)
     public int Value { get; set; } // The amount to change by
+
+    internal static ModifierModel FromDomainEntity(Modifier argModifierModel)
+    {
+        return new ModifierModel
+        {
+            AffectedObject = argModifierModel.AffectedObject,
+            AffectedValue = argModifierModel.AffectedValue,
+            Value = argModifierModel.Value
+        };
+    }
 }
 
-public class Defense 
+public class DefenseModel
 {
-    public string Type { get; set; } // Type of damage (fire, slashing, etc.)
+    [JsonPropertyName("type")]
+    public string DamageType { get; set; } // Type of damage (fire, slashing, etc.)
+    [JsonPropertyName("defense")]
     public string DefenseType { get; set; } // Kind of defense (immunity, resistance, etc.)
+
+    internal static DefenseModel FromDomainEntity(Defence arg)
+    {
+        return new DefenseModel
+        {
+            DamageType = arg.Type.ToString(),
+            DefenseType = arg.Defense.ToString()
+        };
+    }
 }

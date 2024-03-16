@@ -6,30 +6,39 @@ namespace DND_HP_API.CharacterSheet;
 
 [ApiController]
 [Route("[controller]")]
-public class CharacterSheetController: Controller
+public class CharacterSheetController : Controller
 {
-    private readonly List<CharacterSheetModel> _characterSheets = [];
+    private readonly ICharacterSheetRepository _characterSheetRepository;
+
+    public CharacterSheetController(ICharacterSheetRepository characterSheetRepository)
+    {
+        this._characterSheetRepository = characterSheetRepository;
+    }
     
     [HttpGet()]
     public ActionResult<ICollection<CharacterSheetModel>> GetCharacterSheet()
     {
-        return Ok(_characterSheets);
+        var models = _characterSheetRepository.GetAll();
+        var viewModels = models.Select(CharacterSheetModel.BuildFromEntity);
+        return Ok();
     }
-    
+
     [HttpGet("{id}")]
     public ActionResult<CharacterSheetModel> GetCharacterSheet(int id)
     {
-        if (id < 0 || id >= _characterSheets.Count)
+        var character = _characterSheetRepository.Get(id);
+        if(character == null)
         {
             return NotFound();
         }
-        return Ok(_characterSheets[id]);
+        return Ok(CharacterSheetModel.BuildFromEntity(character));
     }
+
     [HttpPost()]
     public ActionResult PostCharacterSheet(CharacterSheetModel characterSheet)
     {
-        _characterSheets.Add(characterSheet);
+
+        _characterSheetRepository.Add(characterSheet.ToDomainEntity());
         return Ok();
     }
-    
 }

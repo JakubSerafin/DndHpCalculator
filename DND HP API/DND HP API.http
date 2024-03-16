@@ -4,25 +4,65 @@ GET {{DND_HP_API_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
-
 GET {{DND_HP_API_HostAddress}}/HpCalculator
 Accept: application/json
 
-###
-
+### GET ALL RECORDS
 GET {{DND_HP_API_HostAddress}}/CharacterSheet
 Accept: application/json
 
-###
-
+### GET FRIST RECORS
 GET {{DND_HP_API_HostAddress}}/CharacterSheet/1
 Accept: application/json
 
-###
+### POST WRONG DATA
+POST {{DND_HP_API_HostAddress}}/CharacterSheet
+Content-Type: application/json
+{
+  "name":""
+}
 
+###POST CORRECT DATA
 POST {{DND_HP_API_HostAddress}}/CharacterSheet
 Content-Type: application/json
 
 {
-  "name":""
+  "name": "Briv",
+  "level": 5,
+  "hitPoints": 25,
+  "classes": [
+    {
+    "name":"fighter",
+    "hitDiceValue":10,
+    "classLevel":5
+    }
+  ],
+  "stats":{
+    "strength":15,
+    "dexterity":12,
+    "constitution":14,
+    "intelligence":13,
+    "wisdom":10,
+    "charisma":8
+  },
+  "items":[
+    {
+      "name":"Ioun Stone of Fortitude",
+      "modifier":{
+        "affectedObject":"stats",
+        "affectedValue":"constitution",
+        "value":2
+      }
+    }
+  ],
+  "defenses":[
+    {
+      "type":"fire",
+      "defense":"immunity"
+    },
+    {
+      "type":"slashing",
+      "defense":"resistance"
+    }
+  ]
 }
