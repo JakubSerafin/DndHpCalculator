@@ -1,10 +1,13 @@
 ﻿
+using DND_HP_API.HpCalculator;
+
 namespace DND_HP_API.CharacterSheet;
 using DND_HP_API.Domain;
 
-public class CharacterSheetRepository : ICharacterSheetRepository
+public class CharacterSheetRepository(IHpModifierRepository hpModifierRepository) : ICharacterSheetRepository
 {
     private readonly List<CharacterSheet> _characterSheets = [];
+    private readonly IHpModifierRepository _hpModifierRepository = hpModifierRepository;
 
     public ICollection<CharacterSheet> GetAll()
     {
@@ -13,18 +16,26 @@ public class CharacterSheetRepository : ICharacterSheetRepository
 
     public CharacterSheet? Get(int id)
     {
-        return _characterSheets.FirstOrDefault(cs => cs.Id == id);
+        return _characterSheets.FirstOrDefault(cs => cs.Id.Value == id);
     }
 
-    public void Add(Domain.CharacterSheet characterSheet)
+    public Id Add(Domain.CharacterSheet characterSheet)
     {
-        characterSheet.Id = _characterSheets.Count + 1;
-        _characterSheets.Add(characterSheet);
+        if (characterSheet.Id.IsTemporary)
+        {
+            characterSheet.Id = new Id(_characterSheets.Count + 1);
+            _characterSheets.Add(characterSheet);
+        }
+        foreach (var hpModifier in characterSheet.HpModifiers)
+        {
+            _hpModifierRepository.Add(hpModifier);
+        }
+        return characterSheet.Id;
     }
 
     public bool Delete(int id)
     {
-        var removedCount = _characterSheets.RemoveAll(m => m.Id == id);
+        var removedCount = _characterSheets.RemoveAll(m => m.Id.Value == id);
         return removedCount > 0;
     }
 }

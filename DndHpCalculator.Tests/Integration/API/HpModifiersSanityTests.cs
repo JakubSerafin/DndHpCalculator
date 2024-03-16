@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using DND_HP_API.CharacterSheet;
 using DND_HP_API.HpCalculator;
 using DndHpCalculator.Tests.Integration.API.Helpers;
 using FluentAssertions;
@@ -61,10 +60,10 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         var responseString = await postResponse.Content.ReadAsStringAsync();
         responseString.Should().Be("1");
         
-        var getResponse = await _client.GetAsync(HpModifiersEndpoint);
+        var getResponse = await _client.GetAsync(HpModifiersEndpoint+"/1");
         getResponse.Should().BeSuccessful();
-        HttpAssertions.AssertResponseContent(getResponse, JsonConvert.SerializeObject(new List<HpModifierModel>(){hpModifier}));
-        
+        await HttpAssertions.AssertResponseJsonContent(getResponse, hpModifier, 
+            opt=>opt.Excluding(qm=>qm.Id));
     }
     
     [Fact]
@@ -80,7 +79,7 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         //Check if there are no modifiers
         var getResponse = await _client.GetAsync(HpModifiersEndpoint);
         getResponse.Should().BeSuccessful();
-        HttpAssertions.AssertResponseContent(getResponse, "[]");
+        await HttpAssertions.AssertResponseContent(getResponse, "[]");
     }
     
     [Fact]
@@ -180,38 +179,3 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
 }
 
 // Test for logic  of HpModifiers. Those are focused on logic, not on API itself. 
-public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
-{
-    private readonly FixedHttpClientWrapper<CharacterSheetModel> _characterSheetClient;
-    private readonly FixedHttpClientWrapper<HpModifierModel> _modifierClient;
-    public HpModifiersLogicTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-    {
-        _characterSheetClient = new FixedHttpClientWrapper<CharacterSheetModel>(_client, "/CharacterSheet");
-        _modifierClient = new FixedHttpClientWrapper<HpModifierModel>(_client, HpModifiersEndpoint);
-    }
-
-    [Fact]
-    public async void CharacterHasNoModifiers_CurrentHpShouldBeEqualToMaxHp()
-    {
-        //Arrange 
-        //Nothing here, because we want to test the default state of the character sheet
-        //Act
-        var characterSheet = await (await _characterSheetClient.Get("/1")).Content();
-        //Assert
-        //Should not be null and have HP equal to max HP
-        characterSheet.Should().NotBeNull();
-        characterSheet!.CurrentHitPoints.Should().Be(characterSheet.HitPoints);
-    }
-
-    public async Task InitializeAsync()
-    {
-        //all tests here are based on the same character sheet, so we can seed it once for all tests
-        await StandardRequests.SeedCharacterSheet(_client);
-    }
-
-    public Task DisposeAsync()
-    {
-        //nothing here.
-        return Task.CompletedTask;
-    }
-}

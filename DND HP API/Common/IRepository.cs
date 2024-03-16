@@ -1,9 +1,13 @@
-﻿namespace DND_HP_API.Common;
+﻿using DND_HP_API.Domain;
+
+namespace DND_HP_API.Common;
 
 public interface IRepository<T>
 {
     ICollection<T> GetAll();
     T? Get(int id);
-    void Add(T item);
+    Id Add(T item);
     bool Delete(int id);
+    
+    
 }

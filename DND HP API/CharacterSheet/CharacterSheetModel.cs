@@ -19,7 +19,7 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
     {
         return new CharacterSheetModel
         {
-            Id = arg.Id,
+            Id = arg.Id.Value,
             Name = arg.Name,
             Level = arg.Level,
             HitPoints = arg.HitPoints,
@@ -44,17 +44,17 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
         return new Domain.CharacterSheet
         {
             //TODO: It should be resolved somehow diffrent, maybe repository should be responsible for creating new Ids based on DTO? 
-            Id = Id??0,
+            Id = Id.HasValue ? new Id(Id.Value) : Domain.Id.NewTemporaryId(),
             Name = Name,
             Level = Level,
             HitPoints = HitPoints,
-            Classes = Classes.Select(x => new Domain.CharacterClass
+            Classes = Classes.Select(x => new CharacterClass
             {
                 Name = x.Name,
                 HitDiceValue = x.HitDiceValue,
                 ClassLevel = x.ClassLevel
             }).ToArray(),
-            Stats = new Domain.Stats
+            Stats = new Stats
             {
                 Strength = Stats.Strength,
                 Dexterity = Stats.Dexterity,
@@ -63,17 +63,17 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
                 Wisdom = Stats.Wisdom,
                 Charisma = Stats.Charisma
             },
-            Items = Items?.Select(x => new Domain.Item
+            Items = Items?.Select(x => new Item
             {
                 Name = x.Name,
-                ModifierModel = new Domain.Modifier
+                ModifierModel = new Modifier
                 {
                     AffectedObject = x.Modifier.AffectedObject,
                     AffectedValue = x.Modifier.AffectedValue,
                     Value = x.Modifier.Value
                 }
             }).ToArray(),
-            Defenses = Defenses?.Select(x => new Domain.Defence
+            Defenses = Defenses?.Select(x => new Defence
             {
                 Type = DamageMapper.MapDamageType(x.DamageType),
                 Defense = DamageMapper.MapDefenceType(x.DefenseType)

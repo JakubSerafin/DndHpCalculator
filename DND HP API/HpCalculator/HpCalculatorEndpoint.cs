@@ -29,7 +29,7 @@ public class HpModifiersController
         {
             return NotFound();
         }
-        return Ok(_hpModifierRepository.GetAll());
+        return Ok(characterSheet.HpModifiers.Select(HpModifierModel.FromEntity));
     }
     
     [HttpGet("{id:int}")]
@@ -41,12 +41,12 @@ public class HpModifiersController
             return NotFound();
         }
 
-        var modifier = _hpModifierRepository.Get(id);
+        var modifier = characterSheet.HpModifiers.FirstOrDefault(m => m.Id.Value == id);
         if(modifier == null)
         {
             return NotFound();
         }
-        return Ok(modifier);
+        return Ok(HpModifierModel.FromEntity(modifier));
     }
 
     [HttpPost]
@@ -57,8 +57,10 @@ public class HpModifiersController
         {
             return NotFound();
         }
-        _hpModifierRepository.Add(hpModifier);
-        return Ok(hpModifier.Id);
+        var hpModifierEntity = hpModifier.BuildEntity();
+        characterSheet.AddHpModifier(hpModifierEntity);
+        _characterSheetRepository.Add(characterSheet);
+        return Ok(hpModifierEntity.Id.Value);
     }
 
     [HttpDelete("{id:int}")]
@@ -69,7 +71,8 @@ public class HpModifiersController
         {
             return NotFound();
         }
-        var wasDeleted = _hpModifierRepository.Delete(id);
+        var wasDeleted = characterSheet.RemoveHpModifier(id);
+        _characterSheetRepository.Add(characterSheet);
         
         if(wasDeleted)
         {
@@ -94,8 +97,6 @@ public class HpModifiersController
         }
         //TODO - this is risky, we should update it in the repository
         existingMod.Value = hpModifier.Value;
-        existingMod.Type = hpModifier.Type;
-        existingMod.Description = hpModifier.Description;
         return Ok();
     }
     

@@ -38,7 +38,7 @@ public class CharacterSheetController : Controller
     public ActionResult PostCharacterSheet(CharacterSheetModel characterSheet)
     {
 
-        _characterSheetRepository.Add(characterSheet.ToDomainEntity());
-        return Ok();
+        var id = _characterSheetRepository.Add(characterSheet.ToDomainEntity());
+        return Ok(id.Value);
     }
 }
