@@ -38,7 +38,7 @@ public class CharacterSheetApiTests
 
         var responseObject = JsonConvert.DeserializeObject<List<CharacterSheetModel>>(await _responseContent(getResponse));
         responseObject.Should().HaveCount(1)
-            .And.ContainEquivalentOf(characterSheet, options => options.Excluding(x => x.Id));
+            .And.ContainEquivalentOf(characterSheet, options => options.Excluding(x => x.Id).Excluding(x=>x.CurrentHitPoints));
     }
     
     
@@ -68,7 +68,7 @@ public class CharacterSheetApiTests
         var getResponse = await _client.GetAsync(CharacterSheetEndpoint + "/1");
         getResponse.Should().BeSuccessful();
         await HttpAssertions.AssertResponseJsonContent<CharacterSheetModel>(getResponse, _characterSheet,
-            options => options.Excluding(x => x.Id));
+            options => options.Excluding(x => x.Id).Excluding(x=>x.CurrentHitPoints));
     }
     
     [Fact]

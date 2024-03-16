@@ -23,6 +23,7 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
             Name = arg.Name,
             Level = arg.Level,
             HitPoints = arg.HitPoints,
+            CurrentHitPoints = arg.CurrentHitPoints,
             Classes = arg.Classes.Select(ClassModel.FromDomainEntity).ToArray(),
             Stats =  new StatsModel
             {
