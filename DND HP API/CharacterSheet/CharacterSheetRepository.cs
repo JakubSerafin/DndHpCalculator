@@ -26,7 +26,7 @@ public class CharacterSheetRepository(IHpModifierRepository hpModifierRepository
             characterSheet.Id = new Id(_characterSheets.Count + 1);
             _characterSheets.Add(characterSheet);
         }
-        foreach (var hpModifier in characterSheet.HpModifiers)
+        foreach (var hpModifier in characterSheet.HitPoints.HpModifiers)
         {
             _hpModifierRepository.Add(hpModifier);
         }

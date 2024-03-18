@@ -29,7 +29,7 @@ public class HpModifiersController
         {
             return NotFound();
         }
-        return Ok(characterSheet.HpModifiers.Select(HpModifierModel.FromEntity));
+        return Ok(characterSheet.HitPoints.HpModifiers.Select(HpModifierModel.FromEntity));
     }
     
     [HttpGet("{id:int}")]
@@ -41,7 +41,7 @@ public class HpModifiersController
             return NotFound();
         }
 
-        var modifier = characterSheet.HpModifiers.FirstOrDefault(m => m.Id.Value == id);
+        var modifier = characterSheet.HitPoints.HpModifiers.FirstOrDefault(m => m.Id.Value == id);
         if(modifier == null)
         {
             return NotFound();
@@ -58,7 +58,7 @@ public class HpModifiersController
             return NotFound();
         }
         var hpModifierEntity = hpModifier.BuildEntity();
-        characterSheet.AddHpModifier(hpModifierEntity);
+        characterSheet.HitPoints.AddHpModifier(hpModifierEntity);
         _characterSheetRepository.Add(characterSheet);
         return Ok(hpModifierEntity.Id.Value);
     }
@@ -71,7 +71,7 @@ public class HpModifiersController
         {
             return NotFound();
         }
-        var wasDeleted = characterSheet.RemoveHpModifier(id);
+        var wasDeleted = characterSheet.HitPoints.RemoveHpModifier(id);
         _characterSheetRepository.Add(characterSheet);
         
         if(wasDeleted)

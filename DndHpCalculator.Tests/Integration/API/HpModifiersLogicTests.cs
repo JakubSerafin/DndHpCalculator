@@ -84,61 +84,125 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
             .Be(characterSheetAfterDamage.HitPoints);
     }
 
-    public record HpModificatorPermutation(HpModifierModel[] Modifiers, int ExpectedHp)
+    public record HpModificatorPermutation(HpModifierModel[] Modifiers, int ExpectedHp, string Description = "")
     {
-        
+        public override string ToString()
+        {
+            return Description;
+        }
     };
-    public static IEnumerable<object[]> HpModifierTypeShouldAffectCharacterHpData()
+    public static readonly IEnumerable<object[]> HpModifierTypeShouldAffectCharacterHpData = new List<object[]>
     {
-        //Last parameter is the expected HP after applying modifiers   
-        //Single Damage modifier
-        yield return
-        [
-            
-            new HpModificatorPermutation([
-                new HpModifierModel()
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
                 {
-                    Value = 5,
-                    Type = "Damage",
-                    Description = "Test"
-                }
-            ], 20),
-        ];
-        
-        //Multiple Damage modifiers
-        yield return
-        [
-            new HpModificatorPermutation([
-                new HpModifierModel
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = "Damage",
+                        Description = "Test"
+                    }
+                }, 20, "Single Damage modifier")
+        },
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
                 {
-                    Value = 5,
-                    Type = "Damage",
-                },
-                new HpModifierModel
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = "Damage",
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = "Damage",
+                    }
+                }, 10, "Multiple Damage modifiers")
+        },
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
                 {
-                    Value = 10,
-                    Type = "Damage",
-                }
-            ], 10)
-        ];
-        
-        //Healt should never go below 0
-        yield return
-        [
-            new HpModificatorPermutation([
-                new HpModifierModel
+                    new HpModifierModel
+                    {
+                        Value = 100,
+                        Type = "Damage",
+                    }
+                }, 0, 
+                "Health should never go below 0")
+        },
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
                 {
-                    Value = 100,
-                    Type = "Damage",
-                }
-            ], 0)
-        ];
-        
-        
-        
-    }
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = "Heal",
+                    }
+                }, 25, 
+                "Single Heal modifier, should not go above max HP")
+        },
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
+                {
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = "Damage",
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = "Heal",
+                    }
+                }, 20, 
+                "Damage then heal modifier")
+        },
+        //Give a character temporary HP
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
+                {
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = "Temporary",
+                    }
+                }, 30, 
+                "Temporary HP modifier")
+        },
+        //Give character two temporary HP modifiers - only bigger one should be used
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
+                {
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = "Temporary",
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = "Temporary",
+                    }
+                }, 35, 
+                "Temporary HP modifier, should use bigger one")
+        },
+    };
     
-    [Theory]
+    [Theory(DisplayName = "Health modifiers should affect character HP")]
     [MemberData(nameof(HpModifierTypeShouldAffectCharacterHpData))]
     public async void HpModifierTypeShouldAffectCharacterHp(HpModificatorPermutation permuations)
     {

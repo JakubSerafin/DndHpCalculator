@@ -22,28 +22,24 @@ public abstract record ValueObject
 {
 }
 
-public class CharacterSheet: Entity
+public record HitPoints(int Max)
 {
-    private readonly List<HpModifier> _hpModifiers = [];
-    public required string Name { get; set; } // Public property to store the character's name
-    public int Level { get; set; } // Public property for the character's level 
-    public int HitPoints { get; set; } // Public property for hit points
+    public int Max { get; set; } = Max;
 
-    public int CurrentHitPoints
+    public int Current
     {
         get
         {
-            var currentHp = HitPoints - HpModifiers.Sum(x => x.Value);
-            return currentHp > 0 ? currentHp : 0;
+            var step = (current:Max, temp:0);
+            foreach (var hpModifier in _hpModifiers)
+            {
+                step = hpModifier.ModifyLifePool(step.current, step.temp);
+            }
+            return step.current;
         }
     }
-
-    public CharacterClass[] Classes { get; set; }
-    public Stats Stats { get; set; }
     
-    public Item[]? Items { get; set; }
-    public Defence[]? Defenses { get; set; }
-
+    private readonly List<HpModifier> _hpModifiers = [];
 
     public IReadOnlyList<HpModifier> HpModifiers => _hpModifiers;
 
@@ -59,6 +55,22 @@ public class CharacterSheet: Entity
         var deletedCount = _hpModifiers.RemoveAll(m => m.Id.Value == id);
         return deletedCount > 0;
     }
+}
+
+public class CharacterSheet: Entity
+{
+
+    public required string Name { get; set; } // Public property to store the character's name
+    public int Level { get; set; } // Public property for the character's level 
+    public HitPoints HitPoints { get; set; } // Public property for hit points
+
+    public int CurrentHitPoints => HitPoints.Current;
+
+    public CharacterClass[] Classes { get; set; }
+    public Stats Stats { get; set; }
+    
+    public Item[]? Items { get; set; }
+    public Defence[]? Defenses { get; set; }
 }
 
 public class CharacterClass: Entity
@@ -163,4 +175,22 @@ public enum DefenceType
 public class HpModifier: Entity
 {
     public int Value { get; set; }
+    public HpModifierType Type { get; set; }
+    public (int, int) ModifyLifePool(int current, int temp)
+    {
+        return Type switch
+        {
+            HpModifierType.Damage => (current - Value, temp),
+            HpModifierType.Healing => (current + Value, temp),
+            HpModifierType.Temporary => (current, Value>=temp? Value: temp),
+            _ => (current, temp)
+        };
+    }
+}
+
+public enum HpModifierType
+{
+    Damage,
+    Healing,
+    Temporary
 }

@@ -22,7 +22,7 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
             Id = arg.Id.Value,
             Name = arg.Name,
             Level = arg.Level,
-            HitPoints = arg.HitPoints,
+            HitPoints =  arg.HitPoints.Current,
             CurrentHitPoints = arg.CurrentHitPoints,
             Classes = arg.Classes.Select(ClassModel.FromDomainEntity).ToArray(),
             Stats =  new StatsModel
@@ -47,7 +47,7 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
             Id = Id.HasValue ? new Id(Id.Value) : Domain.Id.NewTemporaryId(),
             Name = Name,
             Level = Level,
-            HitPoints = HitPoints,
+            HitPoints = new HitPoints(HitPoints),
             Classes = Classes.Select(x => new CharacterClass
             {
                 Name = x.Name,

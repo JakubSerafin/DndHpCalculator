@@ -15,6 +15,7 @@ public class HpModifierModel
         {
             Id = Id.HasValue? new Id(Id.Value) : Domain.Id.NewTemporaryId(),
             Value = Value,
+            Type = Type=="Damage"? HpModifierType.Damage : HpModifierType.Healing,
         };
     }
 
@@ -24,7 +25,7 @@ public class HpModifierModel
         {
             Id = modifier.Id.Value,
             Value = modifier.Value,
-            Type = "Damage",
+            Type = modifier.Type.ToString(),
             Description = "Test"
         };
     }
