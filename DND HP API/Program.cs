@@ -15,9 +15,10 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddSingleton<ICharacterSheetRepository, CharacterSheetInMemoryRepository>();
+        builder.Services.AddSingleton<ICharacterSheetRepository, CharacterSheetSqlLittleRepository>();
         builder.Services.AddSingleton<IHpModifierRepository, HpModifierInMemoryRepository>();
         var app = builder.Build();
+        SqlLiteDatabase.Initialize();
 
         app.UseSwagger();
         app.UseSwaggerUI();

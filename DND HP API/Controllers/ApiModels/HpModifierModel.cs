@@ -6,7 +6,7 @@ namespace DND_HP_API.Controllers.ApiModels;
 
 public class HpModifierModel
 {
-    public int? Id { get; set; }
+    public long? Id { get; set; }
     public int Value { get; set; }
     public string? Type { get; set; }
     public string? Description { get; set; }

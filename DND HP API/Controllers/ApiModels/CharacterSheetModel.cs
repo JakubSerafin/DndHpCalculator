@@ -5,7 +5,7 @@ namespace DND_HP_API.Controllers.ApiModels;
 
 public class CharacterSheetModel// In English, "Character" is the equivalent of "Postać"
 { 
-    public int? Id { get; set; } // Public property to store the character's ID
+    public long? Id { get; set; } // Public property to store the character's ID
     public required string Name { get; set; } // Public property to store the character's name
     public int Level { get; set; } // Public property for the character's level 
     public int HitPoints { get; set; } // Public property for hit points

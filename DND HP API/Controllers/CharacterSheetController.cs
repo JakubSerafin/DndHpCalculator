@@ -1,6 +1,7 @@
 ﻿using DND_HP_API.Controllers.ApiModels;
 using DND_HP_API.Domain;
 using DND_HP_API.Domain.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DND_HP_API.Controllers;

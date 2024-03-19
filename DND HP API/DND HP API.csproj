@@ -17,4 +17,8 @@
       <Folder Include="UseCases\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\DnDHpCalculator.Database\DnDHpCalculator.Database.csproj" />
+    </ItemGroup>
+
 </Project>
