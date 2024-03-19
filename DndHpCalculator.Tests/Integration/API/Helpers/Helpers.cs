@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using DND_HP_API.CharacterSheet;
 using DND_HP_API.HpCalculator;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
@@ -94,12 +95,13 @@ public class FixedHttpClientWrapper<T>(HttpClient client, string path)
 
 public static class StandardRequests
 {
-    public static async Task SeedCharacterSheet(HttpClient client)
+    public static async Task<CharacterSheetModel> SeedCharacterSheet(HttpClient client)
     {
         var characterSheetJson = File.ReadAllText("Data/briv.json");
         var content = new StringContent(characterSheetJson, Encoding.UTF8, "application/json");
         var postResponse = await client.PostAsync("/CharacterSheet", content);
         postResponse.Should().BeSuccessful();
+        return JsonConvert.DeserializeObject<CharacterSheetModel>(characterSheetJson)!;
     }
     
     public static async Task SeedHpModifiers(HttpClient client, HpModifierModel? modifier  = null)

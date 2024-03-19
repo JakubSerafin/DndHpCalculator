@@ -30,12 +30,12 @@ public record HitPoints(int Max)
     {
         get
         {
-            var step = (current:Max, temp:0);
+            var step = new HpModifier.HpModifierInnerCalculationStep(Max, 0, Max);
             foreach (var hpModifier in _hpModifiers)
             {
-                step = hpModifier.ModifyLifePool(step.current, step.temp);
+                step = hpModifier.ModifyLifePool(step);
             }
-            return step.current;
+            return step.Current + step.Temp;
         }
     }
     
@@ -63,8 +63,7 @@ public class CharacterSheet: Entity
     public required string Name { get; set; } // Public property to store the character's name
     public int Level { get; set; } // Public property for the character's level 
     public HitPoints HitPoints { get; set; } // Public property for hit points
-
-    public int CurrentHitPoints => HitPoints.Current;
+    
 
     public CharacterClass[] Classes { get; set; }
     public Stats Stats { get; set; }
@@ -170,27 +169,41 @@ public enum DefenceType
 }
 
 
-
-
-public class HpModifier: Entity
+public abstract class HpModifier: Entity
 {
+    public record HpModifierInnerCalculationStep(int Current, int Temp, int Max);
     public int Value { get; set; }
-    public HpModifierType Type { get; set; }
-    public (int, int) ModifyLifePool(int current, int temp)
+
+    public abstract HpModifierInnerCalculationStep ModifyLifePool(HpModifierInnerCalculationStep step);
+}
+    
+public class HealHpModifier: HpModifier
+{
+    public override HpModifierInnerCalculationStep ModifyLifePool(HpModifierInnerCalculationStep step)
     {
-        return Type switch
+        var calculated = step with {Current = Math.Min(step.Current + Value, step.Max)};
+        return calculated;
+    }
+}
+
+public class DamageHpModifier: HpModifier
+{
+    public override HpModifierInnerCalculationStep ModifyLifePool(HpModifierInnerCalculationStep step)
+    {
+        var remainingDamage = Math.Max(0, Value - step.Temp);
+        return step with 
         {
-            HpModifierType.Damage => (current - Value, temp),
-            HpModifierType.Healing => (current + Value, temp),
-            HpModifierType.Temporary => (current, Value>=temp? Value: temp),
-            _ => (current, temp)
+            Temp = Math.Max(0, step.Temp - Value),
+            Current = Math.Max(0, step.Current - remainingDamage)
         };
     }
 }
 
-public enum HpModifierType
+public class TemporaryHpModifier: HpModifier
 {
-    Damage,
-    Healing,
-    Temporary
+    public override HpModifierInnerCalculationStep ModifyLifePool(HpModifierInnerCalculationStep step)
+    {
+        var calculated = step with {Temp = Math.Max(step.Temp, Value)};
+        return calculated;
+    }
 }

@@ -22,8 +22,8 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
             Id = arg.Id.Value,
             Name = arg.Name,
             Level = arg.Level,
-            HitPoints =  arg.HitPoints.Current,
-            CurrentHitPoints = arg.CurrentHitPoints,
+            HitPoints =  arg.HitPoints.Max,
+            CurrentHitPoints = arg.HitPoints.Current,
             Classes = arg.Classes.Select(ClassModel.FromDomainEntity).ToArray(),
             Stats =  new StatsModel
             {

@@ -1,4 +1,5 @@
 ﻿using DND_HP_API.CharacterSheet;
+using DND_HP_API.Domain;
 using DND_HP_API.HpCalculator;
 using DndHpCalculator.Tests.Integration.API.Helpers;
 using FluentAssertions;
@@ -26,7 +27,7 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
         //Assert
         //Should not be null and have HP equal to max HP
         characterSheet.Should().NotBeNull();
-        characterSheet!.CurrentHitPoints.Should().Be(characterSheet.HitPoints);
+        characterSheet!.CurrentHitPoints.Should().Be(_seededCharacter.HitPoints);
     }
     
     [Fact]
@@ -49,7 +50,7 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
         //Assert
         //Should not be null and have HP equal to max HP minus modifier value
         characterSheet.Should().NotBeNull();
-        characterSheet!.CurrentHitPoints.Should().Be(characterSheet.HitPoints - modifierToSeed.Value);
+        characterSheet!.CurrentHitPoints.Should().Be(_seededCharacter.HitPoints - modifierToSeed.Value);
     }
     
     [Fact]
@@ -61,6 +62,7 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
         var modifierToSeed = new HpModifierModel()
         {
             Value = 5,
+            Type = "Damage",
         };
         
         
@@ -78,10 +80,10 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
         //Assert
         //Should have subtracted hp after taking damage
         characterSheetAfterDamage!.CurrentHitPoints.Should()
-            .Be(characterSheetAfterDamage.HitPoints - modifierToSeed.Value);
+            .Be(_seededCharacter.HitPoints - modifierToSeed.Value);
         //But should have grown back after removing damage
         characterSheetAfterRemovingDamage!.CurrentHitPoints.Should()
-            .Be(characterSheetAfterDamage.HitPoints);
+            .Be(_seededCharacter.HitPoints);
     }
 
     public record HpModificatorPermutation(HpModifierModel[] Modifiers, int ExpectedHp, string Description = "")
@@ -101,7 +103,7 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
                     new HpModifierModel
                     {
                         Value = 5,
-                        Type = "Damage",
+                        Type = HpModifierTypesModel.Damage,
                         Description = "Test"
                     }
                 }, 20, "Single Damage modifier")
@@ -114,12 +116,12 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
                     new HpModifierModel
                     {
                         Value = 5,
-                        Type = "Damage",
+                        Type = HpModifierTypesModel.Damage,
                     },
                     new HpModifierModel
                     {
                         Value = 10,
-                        Type = "Damage",
+                        Type = HpModifierTypesModel.Damage,
                     }
                 }, 10, "Multiple Damage modifiers")
         },
@@ -131,7 +133,7 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
                     new HpModifierModel
                     {
                         Value = 100,
-                        Type = "Damage",
+                        Type = HpModifierTypesModel.Damage,
                     }
                 }, 0, 
                 "Health should never go below 0")
@@ -144,7 +146,7 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
                     new HpModifierModel
                     {
                         Value = 5,
-                        Type = "Heal",
+                        Type = HpModifierTypesModel.Healing,
                     }
                 }, 25, 
                 "Single Heal modifier, should not go above max HP")
@@ -157,12 +159,12 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
                     new HpModifierModel
                     {
                         Value = 10,
-                        Type = "Damage",
+                        Type = HpModifierTypesModel.Damage,
                     },
                     new HpModifierModel
                     {
                         Value = 5,
-                        Type = "Heal",
+                        Type = HpModifierTypesModel.Healing,
                     }
                 }, 20, 
                 "Damage then heal modifier")
@@ -176,7 +178,7 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
                     new HpModifierModel
                     {
                         Value = 5,
-                        Type = "Temporary",
+                        Type = HpModifierTypesModel.Temporary,
                     }
                 }, 30, 
                 "Temporary HP modifier")
@@ -190,18 +192,123 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
                     new HpModifierModel
                     {
                         Value = 5,
-                        Type = "Temporary",
+                        Type = HpModifierTypesModel.Temporary,
                     },
                     new HpModifierModel
                     {
                         Value = 10,
-                        Type = "Temporary",
+                        Type = HpModifierTypesModel.Temporary,
                     }
                 }, 35, 
                 "Temporary HP modifier, should use bigger one")
         },
+        
+        //Damage should be first taken from temp HP that cannot be healed
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
+                {
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = HpModifierTypesModel.Temporary,
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = HpModifierTypesModel.Damage,
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = HpModifierTypesModel.Healing,
+                    }
+                }, 30, 
+                "Damage should be first taken from temp HP that cannot be healed")
+        },
+        // When temp hp is partially used, new temp hp replaces the old one if it is bigger
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
+                {
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = HpModifierTypesModel.Temporary,
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = HpModifierTypesModel.Damage,
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 8,
+                        Type = HpModifierTypesModel.Temporary,
+                    }
+                }, 33, 
+                "When temp hp is partially used, new temp hp replaces the old one (if it is bigger)")
+        },
+        // When temp hp is partially used, new temp hp is ignored if it is still smaller
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
+                {
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = HpModifierTypesModel.Temporary,
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = HpModifierTypesModel.Damage,
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 4,
+                        Type = HpModifierTypesModel.Temporary,
+                    }
+                }, 30, 
+                "When temp hp is partially used, new temp hp is ignored if it is still smaller")
+        },
+        // complex scenario: damage, add temp hp, adamage for part of temp hp, then heal all damage should finish with max Hp + remaining temp hp
+        new object[]
+        {
+            new HpModificatorPermutation(
+                new[]
+                {
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = HpModifierTypesModel.Damage,
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 15,
+                        Type = HpModifierTypesModel.Temporary,
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 5,
+                        Type = HpModifierTypesModel.Damage,
+                    },
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = HpModifierTypesModel.Healing,
+                    }
+                }, 35, 
+                "complex scenario: damage, add temp hp, adamage for part of temp hp, then heal all damage should finish with max Hp + remaining temp hp")
+        },
+        
     };
-    
+
+    private CharacterSheetModel _seededCharacter;
+
     [Theory(DisplayName = "Health modifiers should affect character HP")]
     [MemberData(nameof(HpModifierTypeShouldAffectCharacterHpData))]
     public async void HpModifierTypeShouldAffectCharacterHp(HpModificatorPermutation permuations)
@@ -224,7 +331,7 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
     public async Task InitializeAsync()
     {
         //all tests here are based on the same character sheet, so we can seed it once for all tests
-        await StandardRequests.SeedCharacterSheet(_client);
+        _seededCharacter = await StandardRequests.SeedCharacterSheet(_client);
     }
 
     public Task DisposeAsync()
