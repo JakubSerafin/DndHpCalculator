@@ -1,8 +1,7 @@
 ﻿
-using DND_HP_API.HpCalculator;
-
-namespace DND_HP_API.CharacterSheet;
 using DND_HP_API.Domain;
+
+namespace DND_HP_API.Infrastructure;
 
 public class CharacterSheetRepository(IHpModifierRepository hpModifierRepository) : ICharacterSheetRepository
 {

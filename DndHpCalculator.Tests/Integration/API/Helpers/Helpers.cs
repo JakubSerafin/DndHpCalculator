@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Text;
-using DND_HP_API.CharacterSheet;
-using DND_HP_API.HpCalculator;
+using DND_HP_API.Controllers.ApiModels;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
 using Microsoft.AspNetCore.Mvc;

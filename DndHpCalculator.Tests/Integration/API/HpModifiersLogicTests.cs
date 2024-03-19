@@ -1,6 +1,5 @@
-﻿using DND_HP_API.CharacterSheet;
+﻿using DND_HP_API.Controllers.ApiModels;
 using DND_HP_API.Domain;
-using DND_HP_API.HpCalculator;
 using DndHpCalculator.Tests.Integration.API.Helpers;
 using FluentAssertions;
 using Xunit.Abstractions;

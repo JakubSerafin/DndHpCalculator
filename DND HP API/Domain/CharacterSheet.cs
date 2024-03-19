@@ -1,6 +1,4 @@
-﻿using DND_HP_API.CharacterSheet;
-
-namespace DND_HP_API.Domain;
+﻿namespace DND_HP_API.Domain;
 
 public record Id(int Value, bool IsTemporary = false)
 {

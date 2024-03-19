@@ -1,6 +1,6 @@
 ﻿using DND_HP_API;
-using DND_HP_API.CharacterSheet;
-using DND_HP_API.HpCalculator;
+using DND_HP_API.Domain;
+using DND_HP_API.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;

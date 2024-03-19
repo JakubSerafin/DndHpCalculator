@@ -1,6 +1,4 @@
-﻿using DND_HP_API.Domain;
-
-namespace DND_HP_API.Common;
+﻿namespace DND_HP_API.Domain;
 
 public interface IRepository<T>
 {

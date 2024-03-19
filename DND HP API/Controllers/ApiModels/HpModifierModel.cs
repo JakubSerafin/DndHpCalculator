@@ -1,6 +1,6 @@
 ﻿using DND_HP_API.Domain;
 
-namespace DND_HP_API.HpCalculator;
+namespace DND_HP_API.Controllers.ApiModels;
 
 public static class HpModifierTypesModel
 {

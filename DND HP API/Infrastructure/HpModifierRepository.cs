@@ -1,9 +1,6 @@
-﻿using DND_HP_API.Common;
-using DND_HP_API.Domain;
+﻿using DND_HP_API.Domain;
 
-namespace DND_HP_API.HpCalculator;
-
-public interface IHpModifierRepository : IRepository<HpModifier>;
+namespace DND_HP_API.Infrastructure;
 
 internal class HpModifierRepository : IHpModifierRepository
 {

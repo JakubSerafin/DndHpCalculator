@@ -1,7 +1,8 @@
-﻿using System.Collections;
-using DND_HP_API.CharacterSheet;
+﻿using DND_HP_API.Controllers.ApiModels;
+using DND_HP_API.Domain;
 using Microsoft.AspNetCore.Mvc;
-namespace DND_HP_API.HpCalculator;
+
+namespace DND_HP_API.Controllers;
 
 
 // public API for this module 

@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using DND_HP_API.Domain;
 
-namespace DND_HP_API.CharacterSheet;
+namespace DND_HP_API.Controllers.ApiModels;
 
 public class CharacterSheetModel// In English, "Character" is the equivalent of "Postać"
 { 

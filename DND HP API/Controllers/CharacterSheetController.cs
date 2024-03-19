@@ -1,8 +1,8 @@
-﻿
-
+﻿using DND_HP_API.Controllers.ApiModels;
+using DND_HP_API.Domain;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DND_HP_API.CharacterSheet;
+namespace DND_HP_API.Controllers;
 
 [ApiController]
 [Route("[controller]")]

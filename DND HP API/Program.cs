@@ -1,6 +1,6 @@
 using System.Reflection;
-using DND_HP_API.CharacterSheet;
-using DND_HP_API.HpCalculator;
+using DND_HP_API.Domain;
+using DND_HP_API.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 

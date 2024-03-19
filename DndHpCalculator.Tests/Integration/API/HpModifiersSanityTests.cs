@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using DND_HP_API.HpCalculator;
+using DND_HP_API.Controllers.ApiModels;
 using DndHpCalculator.Tests.Integration.API.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http.HttpResults;

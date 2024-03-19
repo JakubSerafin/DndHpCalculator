@@ -1,5 +1,3 @@
-using DND_HP_API.HpCalculator;
-
 namespace DndHpCalculator.Tests;
 
 public class UnitTest1
