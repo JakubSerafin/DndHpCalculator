@@ -1,8 +1,10 @@
 ﻿using DND_HP_API.Domain;
+using DND_HP_API.Domain.Abstract;
+using DND_HP_API.Domain.Repositories;
 
 namespace DND_HP_API.Infrastructure;
 
-internal class HpModifierRepository : IHpModifierRepository
+internal class HpModifierInMemoryRepository : IHpModifierRepository
 {
     private readonly List<HpModifier> _modifiers = new();
 

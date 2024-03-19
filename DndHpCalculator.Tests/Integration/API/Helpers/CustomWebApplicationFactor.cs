@@ -1,5 +1,6 @@
 ﻿using DND_HP_API;
 using DND_HP_API.Domain;
+using DND_HP_API.Domain.Repositories;
 using DND_HP_API.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -15,8 +16,8 @@ class CustomWebApplicationFactor : WebApplicationFactory<Program>
         //This class will be used to integration test of the API, so we must ensure that data is whipped clean between tests
         builder.ConfigureTestServices(services =>
         {
-            ReinitializeClass<ICharacterSheetRepository, CharacterSheetRepository>(services);
-            ReinitializeClass<IHpModifierRepository, HpModifierRepository>(services);
+            ReinitializeClass<ICharacterSheetRepository, CharacterSheetInMemoryRepository>(services);
+            ReinitializeClass<IHpModifierRepository, HpModifierInMemoryRepository>(services);
         });
         
         void ReinitializeClass<T, T2>(IServiceCollection services) where T:class where T2 : class, T

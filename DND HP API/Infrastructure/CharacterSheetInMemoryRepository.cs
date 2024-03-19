@@ -1,9 +1,11 @@
 ﻿
 using DND_HP_API.Domain;
+using DND_HP_API.Domain.Abstract;
+using DND_HP_API.Domain.Repositories;
 
 namespace DND_HP_API.Infrastructure;
 
-public class CharacterSheetRepository(IHpModifierRepository hpModifierRepository) : ICharacterSheetRepository
+public class CharacterSheetInMemoryRepository(IHpModifierRepository hpModifierRepository) : ICharacterSheetRepository
 {
     private readonly List<CharacterSheet> _characterSheets = [];
     private readonly IHpModifierRepository _hpModifierRepository = hpModifierRepository;

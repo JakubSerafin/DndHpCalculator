@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using DND_HP_API.Domain;
+﻿using DND_HP_API.Domain;
+using DND_HP_API.Domain.Abstract;
 
 namespace DND_HP_API.Controllers.ApiModels;
 
@@ -44,7 +44,7 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
         return new Domain.CharacterSheet
         {
             //TODO: It should be resolved somehow diffrent, maybe repository should be responsible for creating new Ids based on DTO? 
-            Id = Id.HasValue ? new Id(Id.Value) : Domain.Id.NewTemporaryId(),
+            Id = Id.HasValue ? new Id(Id.Value) : Domain.Abstract.Id.NewTemporaryId(),
             Name = Name,
             Level = Level,
             HitPoints = new HitPoints(HitPoints),
@@ -78,82 +78,6 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
                 Type = DamageMapper.MapDamageType(x.DamageType),
                 Defense = DamageMapper.MapDefenceType(x.DefenseType)
             }).ToArray()
-        };
-    }
-}
-
-public class ClassModel 
-{
-    public string Name { get; set; } 
-    public int HitDiceValue { get; set; }
-    public int ClassLevel { get; set; }
-
-    internal static ClassModel FromDomainEntity(CharacterClass arg)
-    {
-        return new ClassModel
-        {
-            Name = arg.Name,
-            HitDiceValue = arg.HitDiceValue,
-            ClassLevel = arg.ClassLevel
-        };
-    }
-}
-
-public class StatsModel
-{
-    public int Strength { get; set; } 
-    public int Dexterity { get; set; }
-    public int Constitution { get; set; }
-    public int Intelligence { get; set; }
-    public int Wisdom { get; set; }
-    public int Charisma { get; set; }
-}
-
-public class ItemModel 
-{
-    public string Name { get; set; }
-    public ModifierModel Modifier { get; set; } 
-    
-    internal static ItemModel FromDomainEntity(Item arg)
-    {
-        return new ItemModel
-        {
-            Name = arg.Name,
-            Modifier = ModifierModel.FromDomainEntity(arg.ModifierModel)
-        };
-    }
-}
-
-public class ModifierModel
-{
-    public string AffectedObject { get; set; } // What the modifier affects (e.g., stats)
-    public string AffectedValue { get; set; } // Specific property to change (e.g., constitution)
-    public int Value { get; set; } // The amount to change by
-
-    internal static ModifierModel FromDomainEntity(Modifier argModifierModel)
-    {
-        return new ModifierModel
-        {
-            AffectedObject = argModifierModel.AffectedObject,
-            AffectedValue = argModifierModel.AffectedValue,
-            Value = argModifierModel.Value
-        };
-    }
-}
-
-public class DefenseModel
-{
-    [JsonPropertyName("type")]
-    public string DamageType { get; set; } // Type of damage (fire, slashing, etc.)
-    [JsonPropertyName("defense")]
-    public string DefenseType { get; set; } // Kind of defense (immunity, resistance, etc.)
-
-    internal static DefenseModel FromDomainEntity(Defence arg)
-    {
-        return new DefenseModel
-        {
-            DamageType = arg.Type.ToString(),
-            DefenseType = arg.Defense.ToString()
         };
     }
 }

@@ -1,5 +1,6 @@
 using System.Reflection;
 using DND_HP_API.Domain;
+using DND_HP_API.Domain.Repositories;
 using DND_HP_API.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -14,8 +15,8 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddSingleton<ICharacterSheetRepository, CharacterSheetRepository>();
-        builder.Services.AddSingleton<IHpModifierRepository, HpModifierRepository>();
+        builder.Services.AddSingleton<ICharacterSheetRepository, CharacterSheetInMemoryRepository>();
+        builder.Services.AddSingleton<IHpModifierRepository, HpModifierInMemoryRepository>();
         var app = builder.Build();
 
         app.UseSwagger();

@@ -1,5 +1,6 @@
 ﻿using DND_HP_API.Controllers.ApiModels;
 using DND_HP_API.Domain;
+using DND_HP_API.Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DND_HP_API.Controllers;
@@ -8,20 +9,11 @@ namespace DND_HP_API.Controllers;
 // public API for this module 
 [ApiController]
 [Route("CharacterSheet/{characterId:int}/[controller]")]
-public class HpModifiersController
+public class HpModifiersController(
+    ICharacterSheetRepository characterSheetRepository,
+    IHpModifierRepository hpModifierRepository)
     : ControllerBase
 {
-    private readonly ICharacterSheetRepository _characterSheetRepository;
-    private readonly IHpModifierRepository _hpModifierRepository;
-
-    public HpModifiersController(
-        ICharacterSheetRepository characterSheetRepository,
-        IHpModifierRepository hpModifierRepository)
-    {
-        this._characterSheetRepository = characterSheetRepository;
-        this._hpModifierRepository = hpModifierRepository;
-    }
-
     [HttpGet()]
     public IActionResult GetModifiers([FromRoute] int characterId)
     {
@@ -60,7 +52,7 @@ public class HpModifiersController
         }
         var hpModifierEntity = hpModifier.BuildEntity();
         characterSheet.HitPoints.AddHpModifier(hpModifierEntity);
-        _characterSheetRepository.Add(characterSheet);
+        characterSheetRepository.Add(characterSheet);
         return Ok(hpModifierEntity.Id.Value);
     }
 
@@ -73,7 +65,7 @@ public class HpModifiersController
             return NotFound();
         }
         var wasDeleted = characterSheet.HitPoints.RemoveHpModifier(id);
-        _characterSheetRepository.Add(characterSheet);
+        characterSheetRepository.Add(characterSheet);
         
         if(wasDeleted)
         {
@@ -91,7 +83,7 @@ public class HpModifiersController
             return NotFound();
         }
 
-        var existingMod = _hpModifierRepository.Get(id);
+        var existingMod = hpModifierRepository.Get(id);
         if(existingMod == null)
         {
             return NotFound();
@@ -103,6 +95,6 @@ public class HpModifiersController
     
     private Domain.CharacterSheet? GetCharacterSheet(int characterId)
     {
-        return _characterSheetRepository.Get(characterId);
+        return characterSheetRepository.Get(characterId);
     }
 }

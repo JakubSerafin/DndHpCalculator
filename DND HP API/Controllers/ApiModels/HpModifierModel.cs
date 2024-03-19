@@ -1,13 +1,8 @@
 ﻿using DND_HP_API.Domain;
+using DND_HP_API.Domain.Abstract;
+using DND_HP_API.Domain.HpModifiers;
 
 namespace DND_HP_API.Controllers.ApiModels;
-
-public static class HpModifierTypesModel
-{
-    public const string Damage = "Damage";
-    public const string Healing = "Healing";
-    public const string Temporary = "Temporary";
-}
 
 public class HpModifierModel
 {
@@ -23,19 +18,19 @@ public class HpModifierModel
             case HpModifierTypesModel.Damage:
                 return new DamageHpModifier
                 {
-                    Id = Id.HasValue ? new Id(Id.Value) : Domain.Id.NewTemporaryId(),
+                    Id = Id.HasValue ? new Id(Id.Value) : Domain.Abstract.Id.NewTemporaryId(),
                     Value = Value,
                 };
             case HpModifierTypesModel.Healing:
                 return new HealHpModifier
                 {
-                    Id = Id.HasValue ? new Id(Id.Value) : Domain.Id.NewTemporaryId(),
+                    Id = Id.HasValue ? new Id(Id.Value) : Domain.Abstract.Id.NewTemporaryId(),
                     Value = Value,
                 };
             case HpModifierTypesModel.Temporary:
                 return new TemporaryHpModifier
                 {
-                    Id = Id.HasValue ? new Id(Id.Value) : Domain.Id.NewTemporaryId(),
+                    Id = Id.HasValue ? new Id(Id.Value) : Domain.Abstract.Id.NewTemporaryId(),
                     Value = Value,
                 };
             default:
