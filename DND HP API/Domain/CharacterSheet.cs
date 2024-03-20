@@ -8,15 +8,11 @@ public class CharacterSheet : Entity
     {
         HitPoints = new HitPoints(maxHp, this);
     }
-
     public required string Name { get; set; }
     public int Level { get; set; }
     public HitPoints HitPoints { get; }
-
-
-    public CharacterClass[] Classes { get; set; }
-    public Stats Stats { get; set; }
-
-    public Item[]? Items { get; set; }
-    public Defence[]? Defenses { get; set; }
+    public List<CharacterClass> Classes { get; init; } = [];
+    public required Stats Stats { get; init; }
+    public List<Item> Items { get; init; } = [];
+    public List<Defence> Defenses { get; init; } = [];
 }

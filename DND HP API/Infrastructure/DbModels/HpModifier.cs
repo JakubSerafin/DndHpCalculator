@@ -3,16 +3,16 @@ using DND_HP_API.Domain;
 using DND_HP_API.Domain.Abstract;
 using DND_HP_API.Domain.HpModifiers;
 
-namespace DnDHpCalculator.Database.DbModels;
+namespace DND_HP_API.Infrastructure.DbModels;
 
 public class HpModifierDbModel
 {
-    public long Id { get; set; }
-    public int Value { get; set; }
-    public string Type { get; set; }
+    public long Id { get; init; }
+    public int Value { get; init; }
+    public required string Type { get; init; }
 
-    public string? DamageType { get; set; }
-    public string Description { get; set; }
+    public string? DamageType { get; init; }
+    public string? Description { get; set; }
 
     public static HpModifierDbModel FromDomainEntity(HpModifier arg)
     {
@@ -45,7 +45,7 @@ public class HpModifierDbModel
                 {
                     Id = new Id(Id),
                     Value = Value,
-                    DamageType = DamageMapper.FromStringName(DamageType)
+                    DamageType = DamageMapper.FromStringName(DamageType??throw new InvalidOperationException("DamageType is null"))
                 };
             case "healing":
                 return new HealHpModifier
@@ -67,14 +67,14 @@ public class HpModifierDbModel
 
 public class CharacterSheetDbModel
 {
-    public required string Name { get; set; }
-    public int Level { get; set; }
-    public int HitPoints { get; set; }
-    public HpModifierDbModel[] HpModifiers { get; set; }
-    public CharacterClass[] Classes { get; set; }
-    public StatsModel Stats { get; set; }
-    public Item[]? Items { get; set; }
-    public Defence[]? Defenses { get; set; }
+    public required string Name { get; init; }
+    public int Level { get; init; }
+    public int HitPoints { get; init; }
+    public required HpModifierDbModel[] HpModifiers { get; init; }
+    public required CharacterClass[] Classes { get; init; }
+    public required StatsModel Stats { get; init; }
+    public Item[]? Items { get; init; }
+    public Defence[]? Defenses { get; init; }
 
     public static CharacterSheetDbModel BuildFromEntity(CharacterSheet arg)
     {
@@ -84,7 +84,7 @@ public class CharacterSheetDbModel
             Level = arg.Level,
             HitPoints = arg.HitPoints.Max,
             HpModifiers = arg.HitPoints.HpModifiers.Select(HpModifierDbModel.FromDomainEntity).ToArray(),
-            Classes = arg.Classes,
+            Classes = arg.Classes.ToArray(),
             Stats = new StatsModel
             {
                 Strength = arg.Stats.Strength,
@@ -94,18 +94,19 @@ public class CharacterSheetDbModel
                 Wisdom = arg.Stats.Wisdom,
                 Charisma = arg.Stats.Charisma
             },
-            Items = arg.Items,
-            Defenses = arg.Defenses
+            Items = arg.Items.ToArray(),
+            Defenses = arg.Defenses.ToArray()
         };
     }
 
-    public CharacterSheet BuildModel()
+    public CharacterSheet BuildModel(Id idOfEntity)
     {
         var cs = new CharacterSheet(HitPoints)
         {
+            Id = idOfEntity,
             Name = Name,
             Level = Level,
-            Classes = Classes,
+            Classes = Classes.ToList(),
             Stats = new Stats
             {
                 Strength = Stats.Strength,
@@ -115,8 +116,8 @@ public class CharacterSheetDbModel
                 Wisdom = Stats.Wisdom,
                 Charisma = Stats.Charisma
             },
-            Items = Items ?? [],
-            Defenses = Defenses ?? []
+            Items = Items?.ToList()??[],
+            Defenses = Defenses?.ToList()??[]
         };
         foreach (var hpModifierDbModel in HpModifiers) cs.HitPoints.AddHpModifier(hpModifierDbModel.BuildModel());
         return cs;

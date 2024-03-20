@@ -10,8 +10,8 @@ public class CharacterSheetModel
     public int Level { get; set; }
     public int HitPoints { get; set; }
     public int CurrentHitPoints { get; set; }
-    public ClassModel[] Classes { get; set; }
-    public StatsModel Stats { get; set; }
+    public required ClassModel[] Classes { get; set; }
+    public required StatsModel Stats { get; set; }
     public ItemModel[]? Items { get; set; }
     public DefenseModel[]? Defenses { get; set; }
 
@@ -34,8 +34,8 @@ public class CharacterSheetModel
                 Wisdom = arg.Stats.Wisdom,
                 Charisma = arg.Stats.Charisma
             },
-            Items = arg.Items?.Select(ItemModel.FromDomainEntity).ToArray() ?? [],
-            Defenses = arg.Defenses?.Select(DefenseModel.FromDomainEntity).ToArray() ?? []
+            Items = arg.Items.Select(ItemModel.FromDomainEntity).ToArray(),
+            Defenses = arg.Defenses.Select(DefenseModel.FromDomainEntity).ToArray()
         };
     }
 
@@ -43,7 +43,6 @@ public class CharacterSheetModel
     {
         return new CharacterSheet(HitPoints)
         {
-            //TODO: It should be resolved somehow diffrent, maybe repository should be responsible for creating new Ids based on DTO? 
             Id = Id.HasValue ? new Id(Id.Value) : Domain.Abstract.Id.NewTemporaryId(),
             Name = Name,
             Level = Level,
@@ -52,7 +51,7 @@ public class CharacterSheetModel
                 Name = x.Name,
                 HitDiceValue = x.HitDiceValue,
                 ClassLevel = x.ClassLevel
-            }).ToArray(),
+            }).ToList(),
             Stats = new Stats
             {
                 Strength = Stats.Strength,
@@ -65,18 +64,18 @@ public class CharacterSheetModel
             Items = Items?.Select(x => new Item
             {
                 Name = x.Name,
-                ModifierModel = new Modifier
+                ModifierModel = x.Modifier!= null? new Modifier
                 {
                     AffectedObject = x.Modifier.AffectedObject,
                     AffectedValue = x.Modifier.AffectedValue,
                     Value = x.Modifier.Value
-                }
-            }).ToArray(),
+                } : null
+            }).ToList() ?? [],
             Defenses = Defenses?.Select(x => new Defence
             {
                 Type = DamageMapper.MapDamageType(x.DamageType),
                 Defense = DamageMapper.MapDefenceType(x.DefenseType)
-            }).ToArray()
+            }).ToList() ?? []
         };
     }
 }

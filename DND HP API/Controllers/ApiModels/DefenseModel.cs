@@ -5,10 +5,10 @@ namespace DND_HP_API.Controllers.ApiModels;
 
 public class DefenseModel
 {
-    [JsonPropertyName("type")] public string DamageType { get; set; } // Type of damage (fire, slashing, etc.)
+    [JsonPropertyName("type")] public required string DamageType { get; init; } // Type of damage (fire, slashing, etc.)
 
     [JsonPropertyName("defense")]
-    public string DefenseType { get; set; } // Kind of defense (immunity, resistance, etc.)
+    public required string DefenseType { get; init; } // Kind of defense (immunity, resistance, etc.)
 
     internal static DefenseModel FromDomainEntity(Defence arg)
     {

@@ -4,15 +4,15 @@ namespace DND_HP_API.Controllers.ApiModels;
 
 public class ItemModel
 {
-    public string Name { get; set; }
-    public ModifierModel Modifier { get; set; }
+    public required string Name { get; init; }
+    public ModifierModel? Modifier { get; init; }
 
     internal static ItemModel FromDomainEntity(Item arg)
     {
         return new ItemModel
         {
             Name = arg.Name,
-            Modifier = ModifierModel.FromDomainEntity(arg.ModifierModel)
+            Modifier = arg.ModifierModel!=null? ModifierModel.FromDomainEntity(arg.ModifierModel):null
         };
     }
 }

@@ -2,6 +2,4 @@
 
 namespace DND_HP_API.Domain.Repositories;
 
-public interface ICharacterSheetRepository : IRepository<CharacterSheet>
-{
-}
+public interface ICharacterSheetRepository : IRepository<CharacterSheet>;

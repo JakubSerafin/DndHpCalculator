@@ -1,7 +1,8 @@
 ﻿using DND_HP_API.Domain;
 using DND_HP_API.Domain.Abstract;
 using DND_HP_API.Domain.Repositories;
-using DnDHpCalculator.Database.DbModels;
+using DND_HP_API.Infrastructure.DbModels;
+using DnDHpCalculator.Database;
 using Newtonsoft.Json;
 
 namespace DND_HP_API.Infrastructure;
@@ -22,9 +23,9 @@ public class CharacterSheetSqlLittleRepository : ICharacterSheetRepository
                     while (reader.Read())
                     {
                         var data = reader.GetString(1);
-                        var characterSheetDb = JsonConvert.DeserializeObject<CharacterSheetDbModel>(data);
-                        var characterSheet = characterSheetDb.BuildModel();
-                        characterSheet.Id = new Id(reader.GetInt32(0));
+                        var characterSheetDb = JsonConvert.DeserializeObject<CharacterSheetDbModel>(data)
+                                               ??throw new Exception("Failed to deserialize character sheet");
+                        var characterSheet = characterSheetDb.BuildModel(new Id(reader.GetInt32(0)));
                         characterSheets.Add(characterSheet);
                     }
 
@@ -48,9 +49,9 @@ public class CharacterSheetSqlLittleRepository : ICharacterSheetRepository
                     if (reader.Read())
                     {
                         var data = reader.GetString(0);
-                        var characterSheetDb = JsonConvert.DeserializeObject<CharacterSheetDbModel>(data);
-                        var characterSheet = characterSheetDb.BuildModel();
-                        characterSheet.Id = new Id(id);
+                        var characterSheetDb = JsonConvert.DeserializeObject<CharacterSheetDbModel>(data)
+                                               ??throw new Exception("Failed to deserialize character sheet");
+                        var characterSheet = characterSheetDb.BuildModel(new Id(id)); 
                         return characterSheet;
                     }
                 }
@@ -65,7 +66,7 @@ public class CharacterSheetSqlLittleRepository : ICharacterSheetRepository
         using (var database = SqlLiteDatabase.GetConnection())
         {
             long? existingRecordId = !item.Id.IsTemporary ? item.Id.Value : null;
-            long resultId = 0;
+            long resultId;
             using (var command = database.CreateCommand())
             {
                 var data = JsonConvert.SerializeObject(CharacterSheetDbModel.BuildFromEntity(item));
@@ -85,7 +86,7 @@ public class CharacterSheetSqlLittleRepository : ICharacterSheetRepository
                 if (existingRecordId.HasValue)
                     resultId = existingRecordId.Value;
                 else
-                    resultId = (int)rowResult.Value;
+                    resultId = (int)(rowResult??throw new Exception("Failed to get last inserted id"));
             }
 
             return new Id(resultId);

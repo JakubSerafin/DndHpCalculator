@@ -12,8 +12,7 @@ namespace DND_HP_API.Controllers;
 [Authorize(Roles = "GameMaster")]
 [Route("CharacterSheet/{characterId:int}/[controller]")]
 public class HpModifiersController(
-    ICharacterSheetRepository characterSheetRepository,
-    IHpModifierRepository hpModifierRepository)
+    ICharacterSheetRepository characterSheetRepository)
     : ControllerBase
 {
     [HttpGet]
@@ -66,6 +65,8 @@ public class HpModifiersController(
         var characterSheet = GetCharacterSheet(characterId);
         if (characterSheet == null) return NotFound();
 
+        // Id type has Equals method that compares the value to string
+        // ReSharper disable once SuspiciousTypeConversion.Global
         var mod = characterSheet.HitPoints.HpModifiers.FirstOrDefault(modifier => modifier.Id.Equals(id));
         if (mod == null) return NotFound();
 

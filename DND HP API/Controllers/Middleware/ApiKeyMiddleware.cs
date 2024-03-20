@@ -9,7 +9,7 @@ public class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions
 {
     public const string DefaultScheme = "ClientKey";
     public const string HeaderName = "x-api-key";
-    public string ApiKey { get; set; }
+    public string? ApiKey { get; set; }
 }
 
 [Obsolete("Obsolete")] //because ISystemClock is obsolete.
@@ -20,18 +20,18 @@ public class ApiKeyAuthenticationHandler(
     ISystemClock clock)
     : AuthenticationHandler<ApiKeyAuthenticationOptions>(options, logger, encoder, clock)
 {
-    protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (!Request.Headers.TryGetValue(ApiKeyAuthenticationOptions.HeaderName, out var apiKey) || apiKey.Count != 1)
         {
             Logger.LogWarning("An API request was received without the x-api-key header");
-            return AuthenticateResult.Fail("Invalid parameters");
+            return Task.FromResult(AuthenticateResult.Fail("Invalid parameters"));
         }
 
         if (apiKey[0] != Options.ApiKey)
         {
             Logger.LogWarning("An API request was received with an invalid x-api-key header");
-            return AuthenticateResult.Fail("Invalid parameters");
+            return Task.FromResult(AuthenticateResult.Fail("Invalid parameters"));
         }
 
         var claims = new[]
@@ -43,6 +43,6 @@ public class ApiKeyAuthenticationHandler(
         var principal = new ClaimsPrincipal(identities);
 
         var ticket = new AuthenticationTicket(principal, ApiKeyAuthenticationOptions.DefaultScheme);
-        return AuthenticateResult.Success(ticket);
+        return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 }

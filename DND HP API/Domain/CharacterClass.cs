@@ -2,9 +2,9 @@
 
 namespace DND_HP_API.Domain;
 
-public class CharacterClass : Entity
+public record CharacterClass : ValueObject
 {
-    public string Name { get; set; }
-    public int HitDiceValue { get; set; }
-    public int ClassLevel { get; set; }
+    public required string Name { get; init; }
+    public int HitDiceValue { get; init; }
+    public int ClassLevel { get; init; }
 }

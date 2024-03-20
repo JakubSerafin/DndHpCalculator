@@ -2,7 +2,6 @@
 using DND_HP_API.Domain;
 using DndHpCalculator.Tests.Integration.API.Helpers;
 using FluentAssertions;
-using Xunit.Abstractions;
 
 namespace DndHpCalculator.Tests.Integration.API;
 
@@ -280,19 +279,20 @@ public class HpModifiersLogicTests : HpModifiersTestsBase, IAsyncLifetime
     private readonly FixedHttpClientWrapper<CharacterSheetModel> _characterSheetClient;
     private readonly FixedHttpClientWrapper<HpModifierModel> _hpModifierClient;
 
-    private CharacterSheetModel _seededCharacter;
+    //it will be initialized in the InitializeAsync method, so null! is to suspend the warning
+    private CharacterSheetModel _seededCharacter = null!;
 
-    public HpModifiersLogicTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    public HpModifiersLogicTests()
     {
-        _characterSheetClient = new FixedHttpClientWrapper<CharacterSheetModel>(_client, "/CharacterSheet");
-        _hpModifierClient = new FixedHttpClientWrapper<HpModifierModel>(_client, HpModifiersEndpoint);
+        _characterSheetClient = new FixedHttpClientWrapper<CharacterSheetModel>(Client, "/CharacterSheet");
+        _hpModifierClient = new FixedHttpClientWrapper<HpModifierModel>(Client, HpModifiersEndpoint);
     }
 
 
     public async Task InitializeAsync()
     {
         //all tests here are based on the same character sheet, so we can seed it once for all tests
-        _seededCharacter = await StandardRequests.SeedCharacterSheet(_client);
+        _seededCharacter = await StandardRequests.SeedCharacterSheet(Client);
     }
 
     public Task DisposeAsync()

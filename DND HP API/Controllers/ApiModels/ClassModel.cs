@@ -4,7 +4,7 @@ namespace DND_HP_API.Controllers.ApiModels;
 
 public class ClassModel
 {
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public int HitDiceValue { get; set; }
     public int ClassLevel { get; set; }
 

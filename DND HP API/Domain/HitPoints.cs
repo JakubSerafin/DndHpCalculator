@@ -2,17 +2,16 @@
 
 namespace DND_HP_API.Domain;
 
-public record HitPoints(int Max, CharacterSheet characterSheet)
+public record HitPoints(int Max, CharacterSheet CharacterSheet)
 {
     private readonly List<HpModifier> _hpModifiers = [];
-    private Defence[]? _defences;
     public int Max { get; } = Max;
 
     public int Current
     {
         get
         {
-            var step = new HpModifier.HpModifierInnerCalculationStep(Max, 0, Max, characterSheet.Defenses);
+            var step = new HpModifier.HpModifierInnerCalculationStep(Max, 0, Max, CharacterSheet.Defenses);
             foreach (var hpModifier in _hpModifiers) step = hpModifier.ModifyLifePool(step);
             return step.Current + step.Temp;
         }

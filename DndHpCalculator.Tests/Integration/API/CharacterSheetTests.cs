@@ -4,7 +4,6 @@ using DND_HP_API.Controllers.ApiModels;
 using DndHpCalculator.Tests.Integration.API.Helpers;
 using FluentAssertions;
 using Newtonsoft.Json;
-using Xunit.Abstractions;
 
 namespace DndHpCalculator.Tests.Integration.API;
 
@@ -15,7 +14,7 @@ public class CharacterSheetApiTests
     private readonly string _characterSheetJson = File.ReadAllText("Data/briv.json");
     private readonly HttpClient _client;
 
-    public CharacterSheetApiTests(ITestOutputHelper testOutputHelper)
+    public CharacterSheetApiTests()
     {
         var factory = new CustomWebApplicationFactor();
         _client = factory.CreateClient();
@@ -26,7 +25,7 @@ public class CharacterSheetApiTests
     [Fact]
     public async Task POST_ShouldUploadAndValidateCharacterSheet()
     {
-        var characterSheet = JsonConvert.DeserializeObject<CharacterSheetModel>(_characterSheetJson);
+        var characterSheet = JsonConvert.DeserializeObject<CharacterSheetModel>(_characterSheetJson)!;
         // POST new character sheet
         var postResponse = await _client.PostAsync(CharacterSheetEndpoint, HttpHelpers.Encode(_characterSheetJson));
         postResponse.Should().BeSuccessful(await _responseContent(postResponse));
@@ -63,7 +62,7 @@ public class CharacterSheetApiTests
     public async void GET_WithExistingId_ShouldReturnCharacterSheet()
     {
         //POST new character sheet
-        var postResponse = await _client.PostAsync(CharacterSheetEndpoint, HttpHelpers.Encode(_characterSheetJson));
+        await _client.PostAsync(CharacterSheetEndpoint, HttpHelpers.Encode(_characterSheetJson));
 
         //Get should return the character sheet
         var getResponse = await _client.GetAsync(CharacterSheetEndpoint + "/1");

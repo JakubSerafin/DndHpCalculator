@@ -1,6 +1,7 @@
 using DND_HP_API.Controllers.Middleware;
 using DND_HP_API.Domain.Repositories;
 using DND_HP_API.Infrastructure;
+using DnDHpCalculator.Database;
 using Microsoft.OpenApi.Models;
 
 namespace DND_HP_API;
@@ -16,10 +17,11 @@ public class Program
         {
             options.DefaultAuthenticateScheme = ApiKeyAuthenticationOptions.DefaultScheme;
             options.DefaultChallengeScheme = ApiKeyAuthenticationOptions.DefaultScheme;
+#pragma warning disable CS0618 // Type or member is obsolete
         }).AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
+#pragma warning restore CS0618 // Type or member is obsolete
             ApiKeyAuthenticationOptions.DefaultScheme,
-            _ => { _.ApiKey = apiKey; });
-        ;
+            options => { options.ApiKey = apiKey; });
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen(c =>
         {
@@ -48,7 +50,9 @@ public class Program
         });
         builder.Services.AddSingleton<ICharacterSheetRepository, CharacterSheetSqlLittleRepository>();
         builder.Services.AddSingleton<IHpModifierRepository, HpModifierInMemoryRepository>()
+#pragma warning disable CS0618 // Type or member is obsolete
             .AddScoped<ApiKeyAuthenticationHandler>();
+#pragma warning restore CS0618 // Type or member is obsolete
         var app = builder.Build();
         SqlLiteDatabase.Initialize();
 
