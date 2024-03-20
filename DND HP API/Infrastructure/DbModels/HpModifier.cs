@@ -10,6 +10,8 @@ public class HpModifierDbModel
     public long Id { get; set; }
     public int Value { get; set; }
     public string Type { get; set; }
+    
+    public string? DamageType { get; set; }
     public string Description { get; set; }
 
     public static HpModifierDbModel FromDomainEntity(HpModifier arg)
@@ -25,7 +27,12 @@ public class HpModifierDbModel
                 TemporaryHpModifier => HpModifierTypesModel.Temporary,
                 _ => throw new InvalidOperationException($"Unsupported type: {arg.GetType()}")
             },
-            Value = arg.Value
+            Value = arg.Value,
+            DamageType = arg switch
+            {
+                DamageHpModifier d => d.DamageType.ToString(),
+                _ => null
+            }
         };
     }
 
@@ -39,6 +46,7 @@ public class HpModifierDbModel
                 {
                     Id = new Id(Id),
                     Value = Value,
+                    DamageType = DamageMapper.FromStringName(DamageType)
                 };
             case "Healing":
                 return new HealHpModifier
@@ -94,11 +102,10 @@ public class CharacterSheetDbModel
     
     public CharacterSheet BuildModel()
     {
-        var cs =  new CharacterSheet
+        var cs =  new CharacterSheet(HitPoints)
         {
             Name = this.Name,
             Level = this.Level,
-            HitPoints = new HitPoints(HitPoints),
             Classes = this.Classes,
             Stats = new Stats
             {

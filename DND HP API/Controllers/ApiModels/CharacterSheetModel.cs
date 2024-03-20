@@ -41,13 +41,12 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
 
     internal Domain.CharacterSheet ToDomainEntity()
     {
-        return new Domain.CharacterSheet
+        return new Domain.CharacterSheet(HitPoints)
         {
             //TODO: It should be resolved somehow diffrent, maybe repository should be responsible for creating new Ids based on DTO? 
             Id = Id.HasValue ? new Id(Id.Value) : Domain.Abstract.Id.NewTemporaryId(),
             Name = Name,
             Level = Level,
-            HitPoints = new HitPoints(HitPoints),
             Classes = Classes.Select(x => new CharacterClass
             {
                 Name = x.Name,

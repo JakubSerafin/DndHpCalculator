@@ -9,6 +9,7 @@ public class HpModifierModel
     public string? Id { get; set; }
     public int Value { get; set; }
     public string? Type { get; set; }
+    public string? DamageType { get; set; }
     public string? Description { get; set; }
 
     public HpModifier BuildEntity()
@@ -20,6 +21,9 @@ public class HpModifierModel
                 {
                     Id = GenerateId(),
                     Value = Value,
+                    DamageType = DamageType != null ? 
+                        DamageMapper.FromStringName(DamageType) :
+                        Domain.DamageType.Bludgeoning
                 };
             case HpModifierTypesModel.Healing:
                 return new HealHpModifier

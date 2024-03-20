@@ -2,7 +2,7 @@
 
 public abstract class HpModifier: Entity
 {
-    public record HpModifierInnerCalculationStep(int Current, int Temp, int Max);
+    public record HpModifierInnerCalculationStep(int Current, int Temp, int Max, Defence[]? characterSheetDefenses);
     public int Value { get; set; }
 
     public abstract HpModifierInnerCalculationStep ModifyLifePool(HpModifierInnerCalculationStep step);

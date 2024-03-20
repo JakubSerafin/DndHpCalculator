@@ -2,7 +2,7 @@
 
 public static class HpModifierTypesModel
 {
-    public const string Damage = "Damage";
-    public const string Healing = "Healing";
-    public const string Temporary = "Temporary";
+    public const string Damage = "damage";
+    public const string Healing = "healing";
+    public const string Temporary = "temporary";
 }

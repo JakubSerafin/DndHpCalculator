@@ -52,7 +52,7 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         HpModifierModel hpModifier = new HpModifierModel()
         {
             Value = 5,
-            Type = "Damage", 
+            Type = HpModifierTypesModel.Damage,
             Description = "Test"
         };
         var postResponse = await _client.PostAsync(HpModifiersEndpoint, HttpHelpers.Encode(JsonConvert.SerializeObject(hpModifier)));
@@ -97,7 +97,7 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         var modifier = new HpModifierModel()
         {
             Value = 20,
-            Type = "Damage", 
+            Type = HpModifierTypesModel.Damage, 
             Description = "Test"
         };
         var putResponse = await _client.PutAsync(HpModifiersEndpoint + $"/{id}", HttpHelpers.Encode(JsonConvert.SerializeObject(modifier)));
@@ -127,7 +127,7 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         var modifierToSeed = new HpModifierModel()
         {
             Value = 5,
-            Type = "Damage",
+            Type = HpModifierTypesModel.Damage,
             Description = "Test"
         };
         await StandardRequests.SeedHpModifiers(_client, modifierToSeed);
@@ -159,7 +159,7 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         var modifierToSeed = new HpModifierModel()
         {
             Value = 5,
-            Type = "Damage",
+            Type = HpModifierTypesModel.Damage,
             Description = "Test"
         };
         var id = await StandardRequests.SeedHpModifiers(_client, modifierToSeed);

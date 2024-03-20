@@ -4,6 +4,16 @@ namespace DND_HP_API.Controllers.ApiModels;
 
 internal static class DamageMapper
 {
+    public static string ToStingName(this DamageType damageType)
+    {
+        return DamageTypeName[damageType];
+    }
+    
+    public static DamageType FromStringName(string damageType)
+    {
+        return DamageTypesMap.TryGetValue(damageType.ToLowerInvariant(), out var type) ? type : throw new InvalidOperationException($"Unsupported damage type: {damageType}");
+    }
+    
     private static readonly Dictionary<string, DamageType> DamageTypesMap = new Dictionary<string, DamageType>
     {
         { "bludgeoning", DamageType.Bludgeoning },
@@ -19,6 +29,23 @@ internal static class DamageMapper
         { "necrotic", DamageType.Necrotic },
         { "psychic", DamageType.Psychic },
         { "force", DamageType.Force }
+    };
+    
+    private static readonly Dictionary<DamageType, string> DamageTypeName = new Dictionary<DamageType, string>
+    {
+        { DamageType.Bludgeoning, "bludgeoning" },
+        { DamageType.Piercing, "piercing" },
+        { DamageType.Slashing, "slashing" },
+        { DamageType.Fire, "fire" },
+        { DamageType.Cold, "cold" },
+        { DamageType.Acid, "acid" },
+        { DamageType.Thunder, "thunder" },
+        { DamageType.Lightning, "lightning" },
+        { DamageType.Poison, "poison" },
+        { DamageType.Radiant, "radiant" },
+        { DamageType.Necrotic, "necrotic" },
+        { DamageType.Psychic, "psychic" },
+        { DamageType.Force, "force" }
     };
 
     private static readonly Dictionary<string, DefenceType> DefenceTypesMap = new Dictionary<string, DefenceType>

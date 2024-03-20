@@ -38,7 +38,7 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
         var modifierToSeed = new HpModifierModel()
         {
             Value = 5,
-            Type = "Damage",
+            Type = HpModifierTypesModel.Damage,
             Description = "Test"
         };
         
@@ -61,7 +61,7 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
         var modifierToSeed = new HpModifierModel()
         {
             Value = 5,
-            Type = "Damage",
+            Type = HpModifierTypesModel.Damage,
         };
         
         
@@ -327,6 +327,84 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
         characterSheet.Should().NotBeNull();
         characterSheet!.CurrentHitPoints.Should().Be(permuations.ExpectedHp);
     }
+    
+    //Assuming we make test on briv.json, and character has fire immunity and slashing resistance, and 25 hp total
+    public static readonly IEnumerable<object[]> ResistanceTestScenarios = new List<object[]>
+    {
+        new object[]
+        {
+            new HpModificatorPermutation
+            (
+                Description: "Damage type that character is not resistant to should take whole damage",
+                Modifiers:
+                [
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = HpModifierTypesModel.Damage,
+                        DamageType = DamageType.Cold.ToStingName()
+                    }
+                ],
+                ExpectedHp: 15
+            ),
+        },
+        new object[]
+        {
+            new HpModificatorPermutation
+            (
+                Description: "Damage type that character is resistant to should take half damage",
+                Modifiers:
+                [
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = HpModifierTypesModel.Damage,
+                        DamageType = DamageType.Slashing.ToStingName()
+                    }
+                ],
+                ExpectedHp: 20
+            ),
+        },
+        new object[]
+        {
+            new HpModificatorPermutation
+            (
+                Description: "Damage type that character is immune to should take no damage",
+                Modifiers:
+                [
+                    new HpModifierModel
+                    {
+                        Value = 10,
+                        Type = HpModifierTypesModel.Damage,
+                        DamageType = DamageType.Fire.ToStingName()
+                    }
+                ],
+                ExpectedHp: 25
+            ),
+        },
+        
+        
+    };
+    [Theory(DisplayName = "Resistances should alter damage dealed to the character")]
+    [MemberData(nameof(ResistanceTestScenarios))]
+    public async void ResistancesShouldAlterDamageDealedToTheCharacter(HpModificatorPermutation permuations)
+    {
+        //Arrange
+        //Seed character sheet - done in constructor
+        //Act
+        //Add modifier
+        foreach (var hpModifierModel in permuations.Modifiers)
+        {
+            await _hpModifierClient.Post(hpModifierModel);
+        }
+        var characterSheet = await (await _characterSheetClient.Get("/1")).Content();
+        //Assert
+        //Should not be null and have HP equal to max HP minus modifier value
+        characterSheet.Should().NotBeNull();
+        characterSheet!.CurrentHitPoints.Should().Be(permuations.ExpectedHp);
+    }
+    
+    
 
     public async Task InitializeAsync()
     {

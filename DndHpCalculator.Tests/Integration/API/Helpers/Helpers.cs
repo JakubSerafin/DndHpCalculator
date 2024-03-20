@@ -109,7 +109,7 @@ public static class StandardRequests
         modifier ??= new HpModifierModel()
         {
             Value = 5,
-            Type = "Damage", 
+            Type = HpModifierTypesModel.Damage, 
             Description = "Test"
         };
         var content = new StringContent(JsonConvert.SerializeObject(modifier), Encoding.UTF8, "application/json");
