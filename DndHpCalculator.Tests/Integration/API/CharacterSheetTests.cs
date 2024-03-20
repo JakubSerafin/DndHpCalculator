@@ -21,6 +21,7 @@ public class CharacterSheetApiTests
     {
         var factory = new CustomWebApplicationFactor();
         _client = factory.CreateClient();
+        _client.DefaultRequestHeaders.Add("x-api-key", "your-api-key");
         _characterSheet = JsonConvert.DeserializeObject<CharacterSheetModel>(_characterSheetJson)!;
     }
 

@@ -17,6 +17,7 @@ public class HpModifiersTestsBase
     {
         var factory = new CustomWebApplicationFactor();
         _client = factory.CreateClient();
+        _client.DefaultRequestHeaders.Add("x-api-key", "your-api-key");
     }
 }
 
