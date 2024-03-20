@@ -17,11 +17,14 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        var configuration = builder.Configuration;
+        var apiKey = configuration["ApiKey"];
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = ApiKeyAuthenticationOptions.DefaultScheme;
             options.DefaultChallengeScheme = ApiKeyAuthenticationOptions.DefaultScheme;
-        }).AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationOptions.DefaultScheme, _ => { });;
+        }).AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationOptions.DefaultScheme,
+            _ => { _.ApiKey = apiKey; });;
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen(c =>
         {
@@ -48,7 +51,6 @@ public class Program
             };
             c.AddSecurityRequirement(requirement);
         });
-
         builder.Services.AddSingleton<ICharacterSheetRepository, CharacterSheetSqlLittleRepository>();
         builder.Services.AddSingleton<IHpModifierRepository, HpModifierInMemoryRepository>()
             .AddScoped<ApiKeyAuthenticationHandler>();
