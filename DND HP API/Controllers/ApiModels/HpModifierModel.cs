@@ -6,7 +6,7 @@ namespace DND_HP_API.Controllers.ApiModels;
 
 public class HpModifierModel
 {
-    public long? Id { get; set; }
+    public string? Id { get; set; }
     public int Value { get; set; }
     public string? Type { get; set; }
     public string? Description { get; set; }
@@ -18,19 +18,19 @@ public class HpModifierModel
             case HpModifierTypesModel.Damage:
                 return new DamageHpModifier
                 {
-                    Id = Id.HasValue ? new Id(Id.Value) : Domain.Abstract.Id.NewTemporaryId(),
+                    Id = GenerateId(),
                     Value = Value,
                 };
             case HpModifierTypesModel.Healing:
                 return new HealHpModifier
                 {
-                    Id = Id.HasValue ? new Id(Id.Value) : Domain.Abstract.Id.NewTemporaryId(),
+                    Id = GenerateId(),
                     Value = Value,
                 };
             case HpModifierTypesModel.Temporary:
                 return new TemporaryHpModifier
                 {
-                    Id = Id.HasValue ? new Id(Id.Value) : Domain.Abstract.Id.NewTemporaryId(),
+                    Id = GenerateId(),
                     Value = Value,
                 };
             default:
@@ -38,11 +38,16 @@ public class HpModifierModel
         }
     }
 
+    private Id GenerateId()
+    {
+        return Id!=null ?  new Id(long.Parse(Id)): Domain.Abstract.Id.NewTemporaryId();
+    }
+
     public static HpModifierModel FromEntity(HpModifier modifier)
     {
         return new HpModifierModel
         {
-            Id = modifier.Id.Value,
+            Id = modifier.Id.Value.ToString(),
             Value = modifier.Value,
             Type = modifier switch
             {

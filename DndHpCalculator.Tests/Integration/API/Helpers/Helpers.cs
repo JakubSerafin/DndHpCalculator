@@ -66,28 +66,28 @@ public class FixedHttpClientWrapper<T>(HttpClient client, string path)
         return new HttpResponseProxy<T>(response);
     }
     
-    public async Task<HttpResponseProxy<T>> Post(T content)
+    public async Task<HttpResponseProxy<string>> Post(T content)
     {
         var response = await client.PostAsync(path, HttpHelpers.Encode(JsonConvert.SerializeObject(content)));
-        return new HttpResponseProxy<T>(response);
+        return new HttpResponseProxy<string>(response);
     }
     
-    public async Task<HttpResponseProxy<T>> Delete(string additionalPath)
+    public async Task<HttpResponseProxy<string>> Delete(string additionalPath)
     {
         var response = await client.DeleteAsync(path + additionalPath);
-        return new HttpResponseProxy<T>(response);
+        return new HttpResponseProxy<string>(response);
     }
     
-    public async Task<HttpResponseProxy<T>> Put(string additionalPath, string content)
+    public async Task<HttpResponseProxy<string>> Put(string additionalPath, string content)
     {
         var response = await client.PutAsync(path + additionalPath, HttpHelpers.Encode(content));
-        return new HttpResponseProxy<T>(response);
+        return new HttpResponseProxy<string>(response);
     }
     
-    public async Task<HttpResponseProxy<T>> Put(string additionalPath, T content)
+    public async Task<HttpResponseProxy<string>> Put(string additionalPath, T content)
     {
         var response = await client.PutAsync(path + additionalPath, HttpHelpers.Encode(JsonConvert.SerializeObject(content)));
-        return new HttpResponseProxy<T>(response);
+        return new HttpResponseProxy<string>(response);
     }
     
 }
@@ -103,7 +103,7 @@ public static class StandardRequests
         return JsonConvert.DeserializeObject<CharacterSheetModel>(characterSheetJson)!;
     }
     
-    public static async Task SeedHpModifiers(HttpClient client, HpModifierModel? modifier  = null)
+    public static async Task<string> SeedHpModifiers(HttpClient client, HpModifierModel? modifier  = null)
     {
         await SeedCharacterSheet(client);
         modifier ??= new HpModifierModel()
@@ -115,5 +115,6 @@ public static class StandardRequests
         var content = new StringContent(JsonConvert.SerializeObject(modifier), Encoding.UTF8, "application/json");
         var postResponse = await client.PostAsync("/CharacterSheet/1/HpModifiers", content);
         postResponse.Should().BeSuccessful();
+        return await postResponse.Content.ReadAsStringAsync();
     }
 }

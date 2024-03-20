@@ -58,9 +58,9 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         postResponse.Should().BeSuccessful();
         //Check if response contains new modifier id 
         var responseString = await postResponse.Content.ReadAsStringAsync();
-        responseString.Should().Be("1");
+        responseString.Should().NotBeNullOrEmpty();
         
-        var getResponse = await _client.GetAsync(HpModifiersEndpoint+"/1");
+        var getResponse = await _client.GetAsync(HpModifiersEndpoint+$"/{responseString}");
         getResponse.Should().BeSuccessful();
         await HttpAssertions.AssertResponseJsonContent(getResponse, hpModifier, 
             opt=>opt.Excluding(qm=>qm.Id));
@@ -72,9 +72,9 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         //Seed character sheet
         await StandardRequests.SeedCharacterSheet(_client);
         //Add modifier
-        await StandardRequests.SeedHpModifiers(_client);
+        var id = await StandardRequests.SeedHpModifiers(_client);
         //Delete modifier
-        var deleteResponse = await _client.DeleteAsync(HpModifiersEndpoint + "/1");
+        var deleteResponse = await _client.DeleteAsync(HpModifiersEndpoint + $"/{id}");
         deleteResponse.Should().BeSuccessful();
         //Check if there are no modifiers
         var getResponse = await _client.GetAsync(HpModifiersEndpoint);
@@ -89,7 +89,7 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         //Seed character sheet
         await StandardRequests.SeedCharacterSheet(_client);
         //Add modifier
-        await StandardRequests.SeedHpModifiers(_client);
+        var id = await StandardRequests.SeedHpModifiers(_client);
         
         //Act
         //Update modifier
@@ -99,13 +99,14 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
             Type = "Damage", 
             Description = "Test"
         };
-        var putResponse = await _client.PutAsync(HpModifiersEndpoint + "/1", HttpHelpers.Encode(JsonConvert.SerializeObject(modifier)));
+        var putResponse = await _client.PutAsync(HpModifiersEndpoint + $"/{id}", HttpHelpers.Encode(JsonConvert.SerializeObject(modifier)));
         
         //Assert
         //Check if modifier is updated
         putResponse.Should().BeSuccessful();
+
         
-        var getResponse = await _client.GetAsync(HpModifiersEndpoint+"/1");
+        var getResponse = await _client.GetAsync(HpModifiersEndpoint+$"/{id}");
         getResponse.Should().BeSuccessful();
         var queriedModifier = JsonConvert.DeserializeObject<HpModifierModel>(await getResponse.Content.ReadAsStringAsync());
         queriedModifier.Should().BeEquivalentTo(modifier, 
@@ -160,11 +161,11 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
             Type = "Damage",
             Description = "Test"
         };
-        await StandardRequests.SeedHpModifiers(_client, modifierToSeed);
+        var id = await StandardRequests.SeedHpModifiers(_client, modifierToSeed);
         
         //Act
         //Get modifier
-        var getResponse = await _client.GetAsync(HpModifiersEndpoint+"/1");
+        var getResponse = await _client.GetAsync(HpModifiersEndpoint+$"/{id}");
         
         //Assert
         //Check if modifier is returned
@@ -174,7 +175,7 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
             opt => 
                 opt.Excluding(qm => qm.Id)
         );
-        gotModel!.Id.Should().Be(1);
+        gotModel!.Id.Should().Be(id);
     }
 }
 

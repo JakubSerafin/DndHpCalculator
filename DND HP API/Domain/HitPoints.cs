@@ -26,13 +26,28 @@ public record HitPoints(int Max)
     public void AddHpModifier(HpModifier hpModifier)
     {
         // Assign an Id to the HpModifier
-        hpModifier.Id = Id.NewTemporaryId(_hpModifiers.Count + 1);
+        if (hpModifier.Id.IsTemporary)
+        {
+            hpModifier.Id = Id.NewTimestampedId();
+        }
         _hpModifiers.Add(hpModifier);
     }
-
-    public bool RemoveHpModifier(int id)
+    
+    public bool RemoveHpModifier(Id id)
     {
-        var deletedCount = _hpModifiers.RemoveAll(m => m.Id.Value == id);
+        var deletedCount = _hpModifiers.RemoveAll(m => m.Id.Equals(id));
         return deletedCount > 0;
+    }
+
+    public void ReplaceModifier(Id modId, HpModifier hpModifier)
+    {
+        //find old mod, replace go with new on but keep the same id
+        var mod = _hpModifiers.Find(mod=>mod.Id.Equals(modId));
+        if (mod != null)
+        {
+            var index = _hpModifiers.IndexOf(mod);
+            hpModifier.Id = modId;
+            _hpModifiers[index] = hpModifier;
+        }
     }
 }

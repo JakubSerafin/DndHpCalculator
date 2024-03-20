@@ -17,7 +17,7 @@ public class HpModifierDbModel
         return new HpModifierDbModel
         {
             Description = "temp",
-            Id = arg.Id.IsTemporary?arg.Id.Value:DateTime.Now.Ticks,
+            Id = !arg.Id.IsTemporary?arg.Id.Value:DateTime.Now.Ticks,
             Type = arg switch
             {
                 HealHpModifier => HpModifierTypesModel.Healing,

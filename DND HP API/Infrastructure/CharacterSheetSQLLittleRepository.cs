@@ -22,7 +22,8 @@ public class CharacterSheetSqlLittleRepository: ICharacterSheetRepository
                     while (reader.Read())
                     {
                         var data = reader.GetString(1);
-                        var characterSheet = JsonConvert.DeserializeObject<CharacterSheet>(data);
+                        var characterSheetDb = JsonConvert.DeserializeObject<CharacterSheetDbModel>(data);
+                        var characterSheet = characterSheetDb.BuildModel();
                         characterSheet.Id = new Id(reader.GetInt32(0));
                         characterSheets.Add(characterSheet);
                     }

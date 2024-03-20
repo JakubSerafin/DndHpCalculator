@@ -1,5 +1,6 @@
 ﻿using DND_HP_API.Controllers.ApiModels;
 using DND_HP_API.Domain;
+using DND_HP_API.Domain.Abstract;
 using DND_HP_API.Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,11 +23,12 @@ public class HpModifiersController(
         {
             return NotFound();
         }
-        return Ok(characterSheet.HitPoints.HpModifiers.Select(HpModifierModel.FromEntity));
+        var modifiers = characterSheet.HitPoints.HpModifiers.Select(HpModifierModel.FromEntity);
+        return Ok(modifiers);
     }
     
-    [HttpGet("{id:int}")]
-    public IActionResult GetModifierById([FromRoute] int characterId, [FromRoute] int id)
+    [HttpGet("{id:long}")]
+    public IActionResult GetModifierById([FromRoute] int characterId, [FromRoute] long id)
     {
         var characterSheet = GetCharacterSheet(characterId);
         if(characterSheet == null)
@@ -53,18 +55,18 @@ public class HpModifiersController(
         var hpModifierEntity = hpModifier.BuildEntity();
         characterSheet.HitPoints.AddHpModifier(hpModifierEntity);
         characterSheetRepository.Add(characterSheet);
-        return Ok(hpModifierEntity.Id.Value);
+        return Ok(hpModifierEntity.Id.Value.ToString());
     }
 
-    [HttpDelete("{id:int}")]
-    public IActionResult RemoveModifier([FromRoute] int id, [FromRoute] int characterId)
+    [HttpDelete("{id}")]
+    public IActionResult RemoveModifier([FromRoute] string id, [FromRoute] int characterId)
     {
         var characterSheet = GetCharacterSheet(characterId);
         if(characterSheet == null)
         {
             return NotFound();
         }
-        var wasDeleted = characterSheet.HitPoints.RemoveHpModifier(id);
+        var wasDeleted =  characterSheet.HitPoints.RemoveHpModifier(Id.NewTemporaryId(id));
         characterSheetRepository.Add(characterSheet);
         
         if(wasDeleted)
@@ -74,8 +76,8 @@ public class HpModifiersController(
         return NoContent();
     }
     
-    [HttpPut("{id:int}")]
-    public IActionResult UpdateModifier([FromRoute] int id, [FromRoute] int characterId, [FromBody] HpModifierModel hpModifier)
+    [HttpPut("{id}")]
+    public IActionResult UpdateModifier([FromRoute] string id, [FromRoute] int characterId, [FromBody] HpModifierModel hpModifier)
     {
         var characterSheet = GetCharacterSheet(characterId);
         if(characterSheet == null)
@@ -83,13 +85,15 @@ public class HpModifiersController(
             return NotFound();
         }
 
-        var existingMod = hpModifierRepository.Get(id);
-        if(existingMod == null)
+        var mod = characterSheet.HitPoints.HpModifiers.FirstOrDefault(modifier => modifier.Id.Equals(id));
+        if(mod == null)
         {
             return NotFound();
         }
-        //TODO - this is risky, we should update it in the repository
-        existingMod.Value = hpModifier.Value;
+
+        characterSheet.HitPoints.ReplaceModifier(mod.Id, hpModifier.BuildEntity());
+        //
+        characterSheetRepository.Add(characterSheet);
         return Ok();
     }
     

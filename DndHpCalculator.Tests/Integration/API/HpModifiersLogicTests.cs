@@ -67,13 +67,14 @@ public class HpModifiersLogicTests: HpModifiersTestsBase, IAsyncLifetime
         
         //Act
         //Add some damage
-        var dagamePosted = await _hpModifierClient.Post(modifierToSeed);
+        var damagePosted = await _hpModifierClient.Post(modifierToSeed);
         // Check status
-        var characterSheetAfterDamage = await (await _characterSheetClient.Get("/1")).Content();
+        var damageId = await damagePosted.Content();
+        var characterSheetAfterDamage = await (await _characterSheetClient.Get($"/1")).Content();
         //Remove some damage
-        await _hpModifierClient.Delete("/1");
+        await _hpModifierClient.Delete($"/{damageId}");
         // Check status
-        var characterSheetAfterRemovingDamage = await (await _characterSheetClient.Get("/1")).Content();
+        var characterSheetAfterRemovingDamage = await (await _characterSheetClient.Get($"/1")).Content();
         
         
         //Assert
