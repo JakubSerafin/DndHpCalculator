@@ -2,6 +2,7 @@
 using DND_HP_API.Domain;
 using DND_HP_API.Domain.Abstract;
 using DND_HP_API.Domain.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DND_HP_API.Controllers;
@@ -9,6 +10,7 @@ namespace DND_HP_API.Controllers;
 
 // public API for this module 
 [ApiController]
+[Authorize(Roles = "GameMaster")]
 [Route("CharacterSheet/{characterId:int}/[controller]")]
 public class HpModifiersController(
     ICharacterSheetRepository characterSheetRepository,

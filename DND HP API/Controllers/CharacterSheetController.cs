@@ -30,6 +30,7 @@ public class CharacterSheetController(ICharacterSheetRepository characterSheetRe
     }
 
     [HttpPost()]
+    [Authorize(Roles = "GameMaster")]
     public ActionResult PostCharacterSheet(CharacterSheetModel characterSheet)
     {
 
