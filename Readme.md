@@ -1,55 +1,53 @@
-﻿# DnD Test Assigment 
-Welcome to the DnD Test Assigment. This is a simple test to see how I approached a problem and solve it.
-
+﻿# DnD Test Assignment
+Welcome to the DnD Test Assignment. This project demonstrates my approach to problem-solving in DnD Beyond's back-end developer challenge.
 
 ## Problem
-Was described here:
+The problem is described here:
 https://github.com/DnDBeyond/ddb-back-end-developer-challenge
 
 ## Solution
-### Architecture of solution
-Repository is based on the Clean Architecture. It has 3 layers:
-- Domain: Storing the business logic and the entities, should not depend on any other layer. Here current player HP is calculated and stored.
-- Controller: Storing the API endpoints and the request/response models. Here the API endpoints are defined. Also, this layer contains data models to be used by an API as input/oputput format
-- Infrastructure: Storing the implementation of the repositories and code neede to connect to external services/data sources. Also contains data models to be used by that sources
-- Application: (Not implemented in current solution)
+### Architecture of the Solution
+The repository is based on Clean Architecture and consists of 3 layers:
+- Domain: This layer stores the business logic and entities and does not depend on any other layer. It calculates and stores the current player's HP.
+- Controller: This layer defines the API endpoints and the request/response models. It also contains data models used as input/output formats by the API.
+- Infrastructure: This layer implements the repositories and code needed to connect to external services/data sources. It also contains data models used by these sources.
+- Application: (Not implemented in the current solution)
 
-### Authorization 
-Aplication is using basic authorization with API Key. Api key is stored in the appsettings.json file, and it is used to access opetation restricted for Game Master like:
-- Create a new character
-- All operations related to modification of character HP
+### Authorization
+The application uses basic authorization with an API Key. The API Key is stored in the `appsettings.json` file and is used to access operations restricted to the Game Master, such as:
+- Creating a new character
+- All operations related to modifying a character's HP
 
 ### Testing
-Application is using xUnit for testing. Right now only integration tests are implemented. In integration tests, in memory repositories are used
+The application uses xUnit for testing. Currently, only integration tests are implemented. These tests use in-memory repositories.
 
-### Database 
-To make project more easy to run and check locally, SQLite is used as a database. It is used to store characters and their HP. DB File is created in the root of the project and it is named `DnD.db`
+### Database
+To simplify local project setup and review, SQLite is used as the database. It stores characters and their HP. The DB file is created in the root of the project and is named `DnD.db`.
 
-
-### Reasoning behind the architecture and decision 
-Some of the reasons behind the architecture and decision are here:
+### Reasoning Behind the Architecture and Decisions
+The reasoning behind the architecture and decisions can be found here:
 [ADL.MD](Docs%2FADL%2FADL.MD)
 
-## How to run 
+## How to Run
 ### Prerequisites
--  Computer
+-  A computer
 - .NET Core 8.0
 
 ### Steps
 1. Clone the repository
 2. Open the terminal and navigate to the root of the repository
-3. set the API Key in the appsettings.json file
-4. run `dotnet restore` command to restore the dependencies
-5. run solution using `dotnet run` command
-6. Open the browser and navigate to `https://localhost:5001/swagger/index.html` to see the API documentation
-7. Yaay! You are ready to go
+3. Set the API Key in the `appsettings.json` file
+4. Run the `dotnet restore` command to restore the dependencies
+5. Run the solution using the `dotnet run` command
+6. Open a browser and navigate to `https://localhost:5001/swagger/index.html` to view the API documentation
+7. You're all set!
 
-
-## Next steps
-Of coures there are some next steps to be done. Some of them are:
-- Switch to some more secure authorization method like OpenID
-- Move the data to some more secure database like SQL Server
-- Introduce user management and allow each user to see only his characters
+## Next Steps
+There are several potential next steps for this project:
+- Switch to a more secure authorization method like OpenID
+- Move the data to a more secure database like SQL Server
+- Introduce user management and allow each user to see only their characters
 - Add more tests
-- Automatically detect and update changes in defences and statistic based on the inventory and equipment
+- Automatically detect and update changes in defenses and statistics based on inventory and equipment
 - Add more operations to the API
+- Implement a description feature in HpModificators to allow the Game Master to add descriptions to each modification. Currently, the description is just a placeholder.
