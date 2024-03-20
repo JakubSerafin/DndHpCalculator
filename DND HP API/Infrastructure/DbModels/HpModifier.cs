@@ -41,20 +41,20 @@ public class HpModifierDbModel
         
         switch (Type)
         {
-            case "Damage":
+            case "damage":
                 return new DamageHpModifier
                 {
                     Id = new Id(Id),
                     Value = Value,
                     DamageType = DamageMapper.FromStringName(DamageType)
                 };
-            case "Healing":
+            case "healing":
                 return new HealHpModifier
                 {
                     Id = new Id(Id),
                     Value = Value,
                 };
-            case "Temporary":
+            case "temporary":
                 return new TemporaryHpModifier
                 {
                     Id = new Id(Id),
