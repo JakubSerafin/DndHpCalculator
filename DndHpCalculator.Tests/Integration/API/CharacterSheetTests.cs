@@ -3,19 +3,17 @@ using System.Text;
 using DND_HP_API.Controllers.ApiModels;
 using DndHpCalculator.Tests.Integration.API.Helpers;
 using FluentAssertions;
-using FluentAssertions.Json;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Xunit.Abstractions;
 
 namespace DndHpCalculator.Tests.Integration.API;
 
 public class CharacterSheetApiTests
 {
-    private readonly HttpClient _client;
-    private readonly string _characterSheetJson = File.ReadAllText("Data/briv.json");
-    private readonly CharacterSheetModel _characterSheet;
     private const string CharacterSheetEndpoint = "/CharacterSheet";
+    private readonly CharacterSheetModel _characterSheet;
+    private readonly string _characterSheetJson = File.ReadAllText("Data/briv.json");
+    private readonly HttpClient _client;
 
     public CharacterSheetApiTests(ITestOutputHelper testOutputHelper)
     {
@@ -37,12 +35,14 @@ public class CharacterSheetApiTests
         var getResponse = await _client.GetAsync(CharacterSheetEndpoint);
         postResponse.Should().BeSuccessful();
 
-        var responseObject = JsonConvert.DeserializeObject<List<CharacterSheetModel>>(await _responseContent(getResponse));
+        var responseObject =
+            JsonConvert.DeserializeObject<List<CharacterSheetModel>>(await _responseContent(getResponse));
         responseObject.Should().HaveCount(1)
-            .And.ContainEquivalentOf(characterSheet, options => options.Excluding(x => x.Id).Excluding(x=>x.CurrentHitPoints));
+            .And.ContainEquivalentOf(characterSheet,
+                options => options.Excluding(x => x.Id).Excluding(x => x.CurrentHitPoints));
     }
-    
-    
+
+
     [Fact]
     public async void GET_NoCharacterSheetShouldReturnEmptyList()
     {
@@ -50,39 +50,39 @@ public class CharacterSheetApiTests
         response.Should().BeSuccessful();
         await HttpAssertions.AssertResponseContent(response, "[]");
     }
-    
+
     [Fact]
     public async void POST_InvalidCharacterSheetShouldReturnBadRequest()
     {
         var content = new StringContent("{}", Encoding.UTF8, "application/json");
-        var response = await _client.PostAsync(CharacterSheetEndpoint,content);
+        var response = await _client.PostAsync(CharacterSheetEndpoint, content);
         response.Should().HaveStatusCode(HttpStatusCode.BadRequest);
     }
-    
+
     [Fact]
     public async void GET_WithExistingId_ShouldReturnCharacterSheet()
     {
         //POST new character sheet
         var postResponse = await _client.PostAsync(CharacterSheetEndpoint, HttpHelpers.Encode(_characterSheetJson));
-        
+
         //Get should return the character sheet
         var getResponse = await _client.GetAsync(CharacterSheetEndpoint + "/1");
         getResponse.Should().BeSuccessful();
-        await HttpAssertions.AssertResponseJsonContent<CharacterSheetModel>(getResponse, _characterSheet,
-            options => options.Excluding(x => x.Id).Excluding(x=>x.CurrentHitPoints));
+        await HttpAssertions.AssertResponseJsonContent(getResponse, _characterSheet,
+            options => options.Excluding(x => x.Id).Excluding(x => x.CurrentHitPoints));
     }
-    
+
     [Fact]
     public async void GET_WithNonExistingId_ShouldReturnNotFound()
     {
         var getResponse = await _client.GetAsync(CharacterSheetEndpoint + "/1");
         getResponse.Should().HaveStatusCode(HttpStatusCode.NotFound);
     }
-    
 
-    
+
     // a little syntax sugar
-    private static async Task<string> _responseContent(HttpResponseMessage response) => await response.Content.ReadAsStringAsync();
-    
-    
+    private static async Task<string> _responseContent(HttpResponseMessage response)
+    {
+        return await response.Content.ReadAsStringAsync();
+    }
 }

@@ -4,37 +4,37 @@
   "hitPoints": 25,
   "classes": [
     {
-    "name":"fighter",
-    "hitDiceValue":10,
-    "classLevel":5
+      "name": "fighter",
+      "hitDiceValue": 10,
+      "classLevel": 5
     }
   ],
-  "stats":{
-    "strength":15,
-    "dexterity":12,
-    "constitution":14,
-    "intelligence":13,
-    "wisdom":10,
-    "charisma":8
+  "stats": {
+    "strength": 15,
+    "dexterity": 12,
+    "constitution": 14,
+    "intelligence": 13,
+    "wisdom": 10,
+    "charisma": 8
   },
-  "items":[
+  "items": [
     {
-      "name":"Ioun Stone of Fortitude",
-      "modifier":{
-        "affectedObject":"stats",
-        "affectedValue":"constitution",
-        "value":2
+      "name": "Ioun Stone of Fortitude",
+      "modifier": {
+        "affectedObject": "stats",
+        "affectedValue": "constitution",
+        "value": 2
       }
     }
   ],
-  "defenses":[
+  "defenses": [
     {
-      "type":"fire",
-      "defense":"immunity"
+      "type": "fire",
+      "defense": "immunity"
     },
     {
-      "type":"slashing",
-      "defense":"resistance"
+      "type": "slashing",
+      "defense": "resistance"
     }
   ]
 }

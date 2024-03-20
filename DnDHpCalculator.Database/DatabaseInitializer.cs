@@ -1,13 +1,10 @@
-﻿using System.IO;
-using Microsoft.Data.Sqlite;
-
+﻿using Microsoft.Data.Sqlite;
 
 public class SqlLiteDatabase
 {
     public static void Initialize()
     {
         if (!File.Exists("DnD.db"))
-        {
             using (var connection = new SqliteConnection("Data Source=DnD.db"))
             {
                 connection.Open();
@@ -21,9 +18,8 @@ public class SqlLiteDatabase
                                                  """;
                 createTableCommand.ExecuteNonQuery();
             }
-        }
     }
-    
+
     public static SqliteConnection GetConnection()
     {
         var connection = new SqliteConnection("Data Source=DnD.db");

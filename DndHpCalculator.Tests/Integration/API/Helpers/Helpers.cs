@@ -3,7 +3,6 @@ using System.Text;
 using DND_HP_API.Controllers.ApiModels;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace DndHpCalculator.Tests.Integration.API.Helpers;
@@ -15,9 +14,9 @@ public static class HttpHelpers
         return new StringContent(content, Encoding.UTF8, "application/json");
     }
 }
+
 public static class HttpAssertions
 {
-   
     public static async Task AssertResponseContent(HttpResponseMessage response, string expectedContent)
     {
         var responseString = await response.Content.ReadAsStringAsync();
@@ -29,10 +28,9 @@ public static class HttpAssertions
     {
         var responseString = await response.Content.ReadAsStringAsync();
         var responseObject = JsonConvert.DeserializeObject<T>(responseString);
-        responseObject.Should().BeEquivalentTo(expectedContent, config?? (x => x));
+        responseObject.Should().BeEquivalentTo(expectedContent, config ?? (x => x));
     }
 }
-
 
 public class HttpResponseProxy<T>(HttpResponseMessage response)
 {
@@ -40,7 +38,7 @@ public class HttpResponseProxy<T>(HttpResponseMessage response)
     {
         return await response.Content.ReadAsStringAsync();
     }
-    
+
     public async Task<T?> Content()
     {
         var content = await response.Content.ReadAsStringAsync();
@@ -52,6 +50,7 @@ public class HttpResponseProxy<T>(HttpResponseMessage response)
         return response.StatusCode;
     }
 }
+
 public class FixedHttpClientWrapper<T>(HttpClient client, string path)
 {
     public async Task<HttpResponseProxy<T>> Get(string additionalPath = "")
@@ -59,37 +58,37 @@ public class FixedHttpClientWrapper<T>(HttpClient client, string path)
         var response = await client.GetAsync(path + additionalPath);
         return new HttpResponseProxy<T>(response);
     }
-    
+
     public async Task<HttpResponseProxy<T>> Post(string content)
     {
         var response = await client.PostAsync(path, HttpHelpers.Encode(content));
         return new HttpResponseProxy<T>(response);
     }
-    
+
     public async Task<HttpResponseProxy<string>> Post(T content)
     {
         var response = await client.PostAsync(path, HttpHelpers.Encode(JsonConvert.SerializeObject(content)));
         return new HttpResponseProxy<string>(response);
     }
-    
+
     public async Task<HttpResponseProxy<string>> Delete(string additionalPath)
     {
         var response = await client.DeleteAsync(path + additionalPath);
         return new HttpResponseProxy<string>(response);
     }
-    
+
     public async Task<HttpResponseProxy<string>> Put(string additionalPath, string content)
     {
         var response = await client.PutAsync(path + additionalPath, HttpHelpers.Encode(content));
         return new HttpResponseProxy<string>(response);
     }
-    
+
     public async Task<HttpResponseProxy<string>> Put(string additionalPath, T content)
     {
-        var response = await client.PutAsync(path + additionalPath, HttpHelpers.Encode(JsonConvert.SerializeObject(content)));
+        var response = await client.PutAsync(path + additionalPath,
+            HttpHelpers.Encode(JsonConvert.SerializeObject(content)));
         return new HttpResponseProxy<string>(response);
     }
-    
 }
 
 public static class StandardRequests
@@ -102,14 +101,14 @@ public static class StandardRequests
         postResponse.Should().BeSuccessful();
         return JsonConvert.DeserializeObject<CharacterSheetModel>(characterSheetJson)!;
     }
-    
-    public static async Task<string> SeedHpModifiers(HttpClient client, HpModifierModel? modifier  = null)
+
+    public static async Task<string> SeedHpModifiers(HttpClient client, HpModifierModel? modifier = null)
     {
         await SeedCharacterSheet(client);
-        modifier ??= new HpModifierModel()
+        modifier ??= new HpModifierModel
         {
             Value = 5,
-            Type = HpModifierTypesModel.Damage, 
+            Type = HpModifierTypesModel.Damage,
             Description = "Test"
         };
         var content = new StringContent(JsonConvert.SerializeObject(modifier), Encoding.UTF8, "application/json");

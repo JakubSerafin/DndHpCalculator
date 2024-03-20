@@ -1,4 +1,5 @@
 ﻿# Decisions
+
 01. [General Project Structure](ADRs%2F01_GeneralProjectStructure.md)
 02. [Hp Calculator should be a component](ADRs/02_HpCalculatorShouldBeAComponent.md)
 3. [Each endpoint should have happy path tested](ADRs/03_EachEndpointShouldHaveHappyPathTested.md)

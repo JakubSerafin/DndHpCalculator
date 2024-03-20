@@ -9,17 +9,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspNetCore.Authentication.ApiKey" Version="8.0.1" />
+        <PackageReference Include="AspNetCore.Authentication.ApiKey" Version="8.0.1"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="UseCases\" />
+        <Folder Include="UseCases\"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DnDHpCalculator.Database\DnDHpCalculator.Database.csproj" />
+        <ProjectReference Include="..\DnDHpCalculator.Database\DnDHpCalculator.Database.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -2,7 +2,6 @@
 using DND_HP_API.Controllers.ApiModels;
 using DndHpCalculator.Tests.Integration.API.Helpers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Newtonsoft.Json;
 using Xunit.Abstractions;
 
@@ -10,9 +9,9 @@ namespace DndHpCalculator.Tests.Integration.API;
 
 public class HpModifiersTestsBase
 {
-    protected readonly HttpClient _client;
     protected const string HpModifiersEndpoint = "/CharacterSheet/1/HpModifiers";
-    
+    protected readonly HttpClient _client;
+
     public HpModifiersTestsBase(ITestOutputHelper testOutputHelper)
     {
         var factory = new CustomWebApplicationFactor();
@@ -26,47 +25,47 @@ public class HpModifiersTestsBase
  are test checking if final HP is calculating right */
 public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModifiersTestsBase(testOutputHelper)
 {
-    
     [Fact]
     public async void GET_NoCharacters_ShouldReturnNotFound()
     {
         var response = await _client.GetAsync(HpModifiersEndpoint);
         response.Should().HaveStatusCode(HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public async void GET_NoHpModifiers_ShouldReturnEmptyList()
     {
         await StandardRequests.SeedCharacterSheet(_client);
-        
+
         var response = await _client.GetAsync(HpModifiersEndpoint);
         response.Should().BeSuccessful();
         HttpAssertions.AssertResponseContent(response, "[]");
     }
-    
+
 
     [Fact]
     public async void POST_ValidHpModifier_ReturnsSuccessAndAssignId()
     {
         await StandardRequests.SeedCharacterSheet(_client);
-        HpModifierModel hpModifier = new HpModifierModel()
+        var hpModifier = new HpModifierModel
         {
             Value = 5,
             Type = HpModifierTypesModel.Damage,
             Description = "Test"
         };
-        var postResponse = await _client.PostAsync(HpModifiersEndpoint, HttpHelpers.Encode(JsonConvert.SerializeObject(hpModifier)));
+        var postResponse = await _client.PostAsync(HpModifiersEndpoint,
+            HttpHelpers.Encode(JsonConvert.SerializeObject(hpModifier)));
         postResponse.Should().BeSuccessful();
         //Check if response contains new modifier id 
         var responseString = await postResponse.Content.ReadAsStringAsync();
         responseString.Should().NotBeNullOrEmpty();
-        
-        var getResponse = await _client.GetAsync(HpModifiersEndpoint+$"/{responseString}");
+
+        var getResponse = await _client.GetAsync(HpModifiersEndpoint + $"/{responseString}");
         getResponse.Should().BeSuccessful();
-        await HttpAssertions.AssertResponseJsonContent(getResponse, hpModifier, 
-            opt=>opt.Excluding(qm=>qm.Id));
+        await HttpAssertions.AssertResponseJsonContent(getResponse, hpModifier,
+            opt => opt.Excluding(qm => qm.Id));
     }
-    
+
     [Fact]
     public async void DELETE_ValidHpModifier_ReturnsSuccessAndDeletesHpModifier()
     {
@@ -82,7 +81,7 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         getResponse.Should().BeSuccessful();
         await HttpAssertions.AssertResponseContent(getResponse, "[]");
     }
-    
+
     [Fact]
     public async void PUT_ValidHpModifier_ReturnsSuccessAndUpdatesHpModifier()
     {
@@ -91,32 +90,33 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         await StandardRequests.SeedCharacterSheet(_client);
         //Add modifier
         var id = await StandardRequests.SeedHpModifiers(_client);
-        
+
         //Act
         //Update modifier
-        var modifier = new HpModifierModel()
+        var modifier = new HpModifierModel
         {
             Value = 20,
-            Type = HpModifierTypesModel.Damage, 
+            Type = HpModifierTypesModel.Damage,
             Description = "Test"
         };
-        var putResponse = await _client.PutAsync(HpModifiersEndpoint + $"/{id}", HttpHelpers.Encode(JsonConvert.SerializeObject(modifier)));
-        
+        var putResponse = await _client.PutAsync(HpModifiersEndpoint + $"/{id}",
+            HttpHelpers.Encode(JsonConvert.SerializeObject(modifier)));
+
         //Assert
         //Check if modifier is updated
         putResponse.Should().BeSuccessful();
 
-        
-        var getResponse = await _client.GetAsync(HpModifiersEndpoint+$"/{id}");
-        getResponse.Should().BeSuccessful();
-        var queriedModifier = JsonConvert.DeserializeObject<HpModifierModel>(await getResponse.Content.ReadAsStringAsync());
-        queriedModifier.Should().BeEquivalentTo(modifier, 
-            opt => 
-                opt.Excluding(qm => qm.Id)
-                );
 
+        var getResponse = await _client.GetAsync(HpModifiersEndpoint + $"/{id}");
+        getResponse.Should().BeSuccessful();
+        var queriedModifier =
+            JsonConvert.DeserializeObject<HpModifierModel>(await getResponse.Content.ReadAsStringAsync());
+        queriedModifier.Should().BeEquivalentTo(modifier,
+            opt =>
+                opt.Excluding(qm => qm.Id)
+        );
     }
-    
+
     [Fact]
     public async void GET_ValidHpModifier_ReturnsSuccessAndReturnsListHpModifier()
     {
@@ -124,31 +124,32 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         //Seed character sheet
         await StandardRequests.SeedCharacterSheet(_client);
         //Add modifier
-        var modifierToSeed = new HpModifierModel()
+        var modifierToSeed = new HpModifierModel
         {
             Value = 5,
             Type = HpModifierTypesModel.Damage,
             Description = "Test"
         };
         await StandardRequests.SeedHpModifiers(_client, modifierToSeed);
-        
+
         //Act
         //Get modifiers
         var getResponse = await _client.GetAsync(HpModifiersEndpoint);
-        
+
         //Assert
         //Check if modifiers are returned
         getResponse.Should().BeSuccessful();
-        var modifiers = JsonConvert.DeserializeObject<List<HpModifierModel>>(await getResponse.Content.ReadAsStringAsync());
+        var modifiers =
+            JsonConvert.DeserializeObject<List<HpModifierModel>>(await getResponse.Content.ReadAsStringAsync());
         //should return one modifier in collection
         modifiers.Should().HaveCount(1);
         // and it should be equal to what we seeded
-        modifiers![0].Should().BeEquivalentTo(modifierToSeed, 
-            opt => 
+        modifiers![0].Should().BeEquivalentTo(modifierToSeed,
+            opt =>
                 opt.Excluding(qm => qm.Id)
         );
     }
-    
+
     [Fact]
     public async void GET_ValidHpModifierById_ReturnsSuccessAndReturnsHpModifierById()
     {
@@ -156,24 +157,24 @@ public class HpModifiersSanityTests(ITestOutputHelper testOutputHelper) : HpModi
         //Seed character sheet
         await StandardRequests.SeedCharacterSheet(_client);
         //Add modifier
-        var modifierToSeed = new HpModifierModel()
+        var modifierToSeed = new HpModifierModel
         {
             Value = 5,
             Type = HpModifierTypesModel.Damage,
             Description = "Test"
         };
         var id = await StandardRequests.SeedHpModifiers(_client, modifierToSeed);
-        
+
         //Act
         //Get modifier
-        var getResponse = await _client.GetAsync(HpModifiersEndpoint+$"/{id}");
-        
+        var getResponse = await _client.GetAsync(HpModifiersEndpoint + $"/{id}");
+
         //Assert
         //Check if modifier is returned
         getResponse.Should().BeSuccessful();
         var gotModel = JsonConvert.DeserializeObject<HpModifierModel>(await getResponse.Content.ReadAsStringAsync());
-        gotModel.Should().BeEquivalentTo(modifierToSeed, 
-            opt => 
+        gotModel.Should().BeEquivalentTo(modifierToSeed,
+            opt =>
                 opt.Excluding(qm => qm.Id)
         );
         gotModel!.Id.Should().Be(id);

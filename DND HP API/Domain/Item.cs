@@ -2,8 +2,8 @@
 
 namespace DND_HP_API.Domain;
 
-public record Item: ValueObject
+public record Item : ValueObject
 {
     public string Name { get; set; }
-    public Modifier ModifierModel { get; set; } 
+    public Modifier ModifierModel { get; set; }
 }

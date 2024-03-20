@@ -1,5 +1,4 @@
-﻿
-using DND_HP_API.Domain;
+﻿using DND_HP_API.Domain;
 using DND_HP_API.Domain.Abstract;
 using DND_HP_API.Domain.Repositories;
 
@@ -20,17 +19,15 @@ public class CharacterSheetInMemoryRepository(IHpModifierRepository hpModifierRe
         return _characterSheets.FirstOrDefault(cs => cs.Id.Value == id);
     }
 
-    public Id Add(Domain.CharacterSheet characterSheet)
+    public Id Add(CharacterSheet characterSheet)
     {
         if (characterSheet.Id.IsTemporary)
         {
             characterSheet.Id = new Id(_characterSheets.Count + 1);
             _characterSheets.Add(characterSheet);
         }
-        foreach (var hpModifier in characterSheet.HitPoints.HpModifiers)
-        {
-            _hpModifierRepository.Add(hpModifier);
-        }
+
+        foreach (var hpModifier in characterSheet.HitPoints.HpModifiers) _hpModifierRepository.Add(hpModifier);
         return characterSheet.Id;
     }
 

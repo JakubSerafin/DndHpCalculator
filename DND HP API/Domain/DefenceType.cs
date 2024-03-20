@@ -11,7 +11,7 @@ public static class DefenceTypeExtensions
     //Percent of damage to reduce
     public static double ReduceFactor(this DefenceType defenceType)
     {
-        switch(defenceType)
+        switch (defenceType)
         {
             case DefenceType.Immunity:
                 return 1;

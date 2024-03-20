@@ -10,7 +10,7 @@ public class HpModifierDbModel
     public long Id { get; set; }
     public int Value { get; set; }
     public string Type { get; set; }
-    
+
     public string? DamageType { get; set; }
     public string Description { get; set; }
 
@@ -19,7 +19,7 @@ public class HpModifierDbModel
         return new HpModifierDbModel
         {
             Description = "temp",
-            Id = !arg.Id.IsTemporary?arg.Id.Value:DateTime.Now.Ticks,
+            Id = !arg.Id.IsTemporary ? arg.Id.Value : DateTime.Now.Ticks,
             Type = arg switch
             {
                 HealHpModifier => HpModifierTypesModel.Healing,
@@ -38,7 +38,6 @@ public class HpModifierDbModel
 
     public HpModifier BuildModel()
     {
-        
         switch (Type)
         {
             case "damage":
@@ -52,13 +51,13 @@ public class HpModifierDbModel
                 return new HealHpModifier
                 {
                     Id = new Id(Id),
-                    Value = Value,
+                    Value = Value
                 };
             case "temporary":
                 return new TemporaryHpModifier
                 {
                     Id = new Id(Id),
-                    Value = Value,
+                    Value = Value
                 };
             default:
                 throw new InvalidOperationException($"Unsupported type: {Type}");
@@ -69,24 +68,24 @@ public class HpModifierDbModel
 public class CharacterSheetDbModel
 {
     public required string Name { get; set; }
-    public int Level { get; set; }  
-    public int HitPoints { get; set; } 
-    public HpModifierDbModel[] HpModifiers { get; set; } 
-    public CharacterClass[] Classes { get; set; } 
-    public StatsModel Stats { get; set; } 
-    public Item[]? Items { get; set; } 
+    public int Level { get; set; }
+    public int HitPoints { get; set; }
+    public HpModifierDbModel[] HpModifiers { get; set; }
+    public CharacterClass[] Classes { get; set; }
+    public StatsModel Stats { get; set; }
+    public Item[]? Items { get; set; }
     public Defence[]? Defenses { get; set; }
-    
+
     public static CharacterSheetDbModel BuildFromEntity(CharacterSheet arg)
     {
         return new CharacterSheetDbModel
         {
             Name = arg.Name,
             Level = arg.Level,
-            HitPoints =  arg.HitPoints.Max,
+            HitPoints = arg.HitPoints.Max,
             HpModifiers = arg.HitPoints.HpModifiers.Select(HpModifierDbModel.FromDomainEntity).ToArray(),
             Classes = arg.Classes,
-            Stats =  new StatsModel
+            Stats = new StatsModel
             {
                 Strength = arg.Stats.Strength,
                 Dexterity = arg.Stats.Dexterity,
@@ -99,30 +98,27 @@ public class CharacterSheetDbModel
             Defenses = arg.Defenses
         };
     }
-    
+
     public CharacterSheet BuildModel()
     {
-        var cs =  new CharacterSheet(HitPoints)
+        var cs = new CharacterSheet(HitPoints)
         {
-            Name = this.Name,
-            Level = this.Level,
-            Classes = this.Classes,
+            Name = Name,
+            Level = Level,
+            Classes = Classes,
             Stats = new Stats
             {
-                Strength = this.Stats.Strength,
-                Dexterity = this.Stats.Dexterity,
-                Constitution = this.Stats.Constitution,
-                Intelligence = this.Stats.Intelligence,
-                Wisdom = this.Stats.Wisdom,
-                Charisma = this.Stats.Charisma
+                Strength = Stats.Strength,
+                Dexterity = Stats.Dexterity,
+                Constitution = Stats.Constitution,
+                Intelligence = Stats.Intelligence,
+                Wisdom = Stats.Wisdom,
+                Charisma = Stats.Charisma
             },
-            Items = this.Items??[],
-            Defenses = this.Defenses??[]
+            Items = Items ?? [],
+            Defenses = Defenses ?? []
         };
-        foreach (var hpModifierDbModel in this.HpModifiers)
-        {
-            cs.HitPoints.AddHpModifier(hpModifierDbModel.BuildModel());
-        }
+        foreach (var hpModifierDbModel in HpModifiers) cs.HitPoints.AddHpModifier(hpModifierDbModel.BuildModel());
         return cs;
     }
 }

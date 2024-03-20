@@ -2,7 +2,7 @@
 
 namespace DND_HP_API.Domain;
 
-public record Stats:ValueObject
+public record Stats : ValueObject
 {
     public int Strength { get; set; }
     public int Dexterity { get; set; }

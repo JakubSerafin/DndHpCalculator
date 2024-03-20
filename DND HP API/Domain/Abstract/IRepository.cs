@@ -6,6 +6,4 @@ public interface IRepository<T>
     T? Get(int id);
     Id Add(T item);
     bool Delete(int id);
-    
-    
 }

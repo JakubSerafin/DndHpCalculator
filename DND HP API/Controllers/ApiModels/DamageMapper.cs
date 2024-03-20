@@ -4,17 +4,7 @@ namespace DND_HP_API.Controllers.ApiModels;
 
 internal static class DamageMapper
 {
-    public static string ToStingName(this DamageType damageType)
-    {
-        return DamageTypeName[damageType];
-    }
-    
-    public static DamageType FromStringName(string damageType)
-    {
-        return DamageTypesMap.TryGetValue(damageType.ToLowerInvariant(), out var type) ? type : throw new InvalidOperationException($"Unsupported damage type: {damageType}");
-    }
-    
-    private static readonly Dictionary<string, DamageType> DamageTypesMap = new Dictionary<string, DamageType>
+    private static readonly Dictionary<string, DamageType> DamageTypesMap = new()
     {
         { "bludgeoning", DamageType.Bludgeoning },
         { "piercing", DamageType.Piercing },
@@ -30,8 +20,8 @@ internal static class DamageMapper
         { "psychic", DamageType.Psychic },
         { "force", DamageType.Force }
     };
-    
-    private static readonly Dictionary<DamageType, string> DamageTypeName = new Dictionary<DamageType, string>
+
+    private static readonly Dictionary<DamageType, string> DamageTypeName = new()
     {
         { DamageType.Bludgeoning, "bludgeoning" },
         { DamageType.Piercing, "piercing" },
@@ -48,11 +38,23 @@ internal static class DamageMapper
         { DamageType.Force, "force" }
     };
 
-    private static readonly Dictionary<string, DefenceType> DefenceTypesMap = new Dictionary<string, DefenceType>
+    private static readonly Dictionary<string, DefenceType> DefenceTypesMap = new()
     {
         { "immunity", DefenceType.Immunity },
         { "resistance", DefenceType.Resistance }
     };
+
+    public static string ToStingName(this DamageType damageType)
+    {
+        return DamageTypeName[damageType];
+    }
+
+    public static DamageType FromStringName(string damageType)
+    {
+        return DamageTypesMap.TryGetValue(damageType.ToLowerInvariant(), out var type)
+            ? type
+            : throw new InvalidOperationException($"Unsupported damage type: {damageType}");
+    }
 
     public static DamageType MapDamageType(string damageType)
     {

@@ -1,13 +1,6 @@
-using System.Reflection;
-using System.Security.Claims;
-using AspNetCore.Authentication.ApiKey;
 using DND_HP_API.Controllers.Middleware;
-using DND_HP_API.Domain;
 using DND_HP_API.Domain.Repositories;
 using DND_HP_API.Infrastructure;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.OpenApi.Models;
 
 namespace DND_HP_API;
@@ -23,8 +16,10 @@ public class Program
         {
             options.DefaultAuthenticateScheme = ApiKeyAuthenticationOptions.DefaultScheme;
             options.DefaultChallengeScheme = ApiKeyAuthenticationOptions.DefaultScheme;
-        }).AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationOptions.DefaultScheme,
-            _ => { _.ApiKey = apiKey; });;
+        }).AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
+            ApiKeyAuthenticationOptions.DefaultScheme,
+            _ => { _.ApiKey = apiKey; });
+        ;
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen(c =>
         {
@@ -36,7 +31,7 @@ public class Program
                 In = ParameterLocation.Header,
                 Scheme = "ApiKeyScheme"
             });
-            var key = new OpenApiSecurityScheme()
+            var key = new OpenApiSecurityScheme
             {
                 Reference = new OpenApiReference
                 {

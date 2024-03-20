@@ -1,5 +1,4 @@
-﻿using DND_HP_API.Domain;
-using DND_HP_API.Domain.Abstract;
+﻿using DND_HP_API.Domain.Abstract;
 using DND_HP_API.Domain.HpModifiers;
 
 namespace DND_HP_API.Controllers.ApiModels;
@@ -21,21 +20,21 @@ public class HpModifierModel
                 {
                     Id = GenerateId(),
                     Value = Value,
-                    DamageType = DamageType != null ? 
-                        DamageMapper.FromStringName(DamageType) :
-                        Domain.DamageType.Bludgeoning
+                    DamageType = DamageType != null
+                        ? DamageMapper.FromStringName(DamageType)
+                        : Domain.DamageType.Bludgeoning
                 };
             case HpModifierTypesModel.Healing:
                 return new HealHpModifier
                 {
                     Id = GenerateId(),
-                    Value = Value,
+                    Value = Value
                 };
             case HpModifierTypesModel.Temporary:
                 return new TemporaryHpModifier
                 {
                     Id = GenerateId(),
-                    Value = Value,
+                    Value = Value
                 };
             default:
                 throw new InvalidOperationException($"Unsupported type: {Type}");
@@ -44,7 +43,7 @@ public class HpModifierModel
 
     private Id GenerateId()
     {
-        return Id!=null ?  new Id(long.Parse(Id)): Domain.Abstract.Id.NewTemporaryId();
+        return Id != null ? new Id(long.Parse(Id)) : Domain.Abstract.Id.NewTemporaryId();
     }
 
     public static HpModifierModel FromEntity(HpModifier modifier)

@@ -3,29 +3,29 @@ using DND_HP_API.Domain.Abstract;
 
 namespace DND_HP_API.Controllers.ApiModels;
 
-public class CharacterSheetModel// In English, "Character" is the equivalent of "Postać"
-{ 
-    public long? Id { get; set; } // Public property to store the character's ID
-    public required string Name { get; set; } // Public property to store the character's name
-    public int Level { get; set; } // Public property for the character's level 
-    public int HitPoints { get; set; } // Public property for hit points
-    public int CurrentHitPoints { get; set; } // CalculatedProperty of the character's current hit points
-    public ClassModel[] Classes { get; set; } // Array of "Class" objects for multiple classes
-    public StatsModel Stats { get; set; } // Holds the character's statistics
-    public ItemModel[]? Items { get; set; } // Array to hold the character's items
-    public DefenseModel[]? Defenses { get; set; } // Array of "Defense" objects
-    
-    internal static CharacterSheetModel BuildFromEntity(Domain.CharacterSheet arg)
+public class CharacterSheetModel
+{
+    public long? Id { get; set; }
+    public required string Name { get; set; }
+    public int Level { get; set; }
+    public int HitPoints { get; set; }
+    public int CurrentHitPoints { get; set; }
+    public ClassModel[] Classes { get; set; }
+    public StatsModel Stats { get; set; }
+    public ItemModel[]? Items { get; set; }
+    public DefenseModel[]? Defenses { get; set; }
+
+    internal static CharacterSheetModel BuildFromEntity(CharacterSheet arg)
     {
         return new CharacterSheetModel
         {
             Id = arg.Id.Value,
             Name = arg.Name,
             Level = arg.Level,
-            HitPoints =  arg.HitPoints.Max,
+            HitPoints = arg.HitPoints.Max,
             CurrentHitPoints = arg.HitPoints.Current,
             Classes = arg.Classes.Select(ClassModel.FromDomainEntity).ToArray(),
-            Stats =  new StatsModel
+            Stats = new StatsModel
             {
                 Strength = arg.Stats.Strength,
                 Dexterity = arg.Stats.Dexterity,
@@ -34,14 +34,14 @@ public class CharacterSheetModel// In English, "Character" is the equivalent of 
                 Wisdom = arg.Stats.Wisdom,
                 Charisma = arg.Stats.Charisma
             },
-            Items = arg.Items?.Select(ItemModel.FromDomainEntity).ToArray()??[],
-            Defenses = arg.Defenses?.Select(DefenseModel.FromDomainEntity).ToArray()??[]
+            Items = arg.Items?.Select(ItemModel.FromDomainEntity).ToArray() ?? [],
+            Defenses = arg.Defenses?.Select(DefenseModel.FromDomainEntity).ToArray() ?? []
         };
     }
 
-    internal Domain.CharacterSheet ToDomainEntity()
+    internal CharacterSheet ToDomainEntity()
     {
-        return new Domain.CharacterSheet(HitPoints)
+        return new CharacterSheet(HitPoints)
         {
             //TODO: It should be resolved somehow diffrent, maybe repository should be responsible for creating new Ids based on DTO? 
             Id = Id.HasValue ? new Id(Id.Value) : Domain.Abstract.Id.NewTemporaryId(),

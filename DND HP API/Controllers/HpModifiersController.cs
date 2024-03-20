@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DND_HP_API.Controllers;
 
-
 // public API for this module 
 [ApiController]
 [Authorize(Roles = "GameMaster")]
@@ -17,32 +16,23 @@ public class HpModifiersController(
     IHpModifierRepository hpModifierRepository)
     : ControllerBase
 {
-    [HttpGet()]
+    [HttpGet]
     public IActionResult GetModifiers([FromRoute] int characterId)
     {
         var characterSheet = GetCharacterSheet(characterId);
-        if(characterSheet == null)
-        {
-            return NotFound();
-        }
+        if (characterSheet == null) return NotFound();
         var modifiers = characterSheet.HitPoints.HpModifiers.Select(HpModifierModel.FromEntity);
         return Ok(modifiers);
     }
-    
+
     [HttpGet("{id:long}")]
     public IActionResult GetModifierById([FromRoute] int characterId, [FromRoute] long id)
     {
         var characterSheet = GetCharacterSheet(characterId);
-        if(characterSheet == null)
-        {
-            return NotFound();
-        }
+        if (characterSheet == null) return NotFound();
 
         var modifier = characterSheet.HitPoints.HpModifiers.FirstOrDefault(m => m.Id.Value == id);
-        if(modifier == null)
-        {
-            return NotFound();
-        }
+        if (modifier == null) return NotFound();
         return Ok(HpModifierModel.FromEntity(modifier));
     }
 
@@ -50,10 +40,7 @@ public class HpModifiersController(
     public IActionResult AddModifier([FromRoute] int characterId, [FromBody] HpModifierModel hpModifier)
     {
         var characterSheet = GetCharacterSheet(characterId);
-        if(characterSheet == null)
-        {
-            return NotFound();
-        }
+        if (characterSheet == null) return NotFound();
         var hpModifierEntity = hpModifier.BuildEntity();
         characterSheet.HitPoints.AddHpModifier(hpModifierEntity);
         characterSheetRepository.Add(characterSheet);
@@ -64,42 +51,31 @@ public class HpModifiersController(
     public IActionResult RemoveModifier([FromRoute] string id, [FromRoute] int characterId)
     {
         var characterSheet = GetCharacterSheet(characterId);
-        if(characterSheet == null)
-        {
-            return NotFound();
-        }
-        var wasDeleted =  characterSheet.HitPoints.RemoveHpModifier(Id.NewTemporaryId(id));
+        if (characterSheet == null) return NotFound();
+        var wasDeleted = characterSheet.HitPoints.RemoveHpModifier(Id.NewTemporaryId(id));
         characterSheetRepository.Add(characterSheet);
-        
-        if(wasDeleted)
-        {
-            return Ok();
-        }
+
+        if (wasDeleted) return Ok();
         return NoContent();
     }
-    
+
     [HttpPut("{id}")]
-    public IActionResult UpdateModifier([FromRoute] string id, [FromRoute] int characterId, [FromBody] HpModifierModel hpModifier)
+    public IActionResult UpdateModifier([FromRoute] string id, [FromRoute] int characterId,
+        [FromBody] HpModifierModel hpModifier)
     {
         var characterSheet = GetCharacterSheet(characterId);
-        if(characterSheet == null)
-        {
-            return NotFound();
-        }
+        if (characterSheet == null) return NotFound();
 
         var mod = characterSheet.HitPoints.HpModifiers.FirstOrDefault(modifier => modifier.Id.Equals(id));
-        if(mod == null)
-        {
-            return NotFound();
-        }
+        if (mod == null) return NotFound();
 
         characterSheet.HitPoints.ReplaceModifier(mod.Id, hpModifier.BuildEntity());
         //
         characterSheetRepository.Add(characterSheet);
         return Ok();
     }
-    
-    private Domain.CharacterSheet? GetCharacterSheet(int characterId)
+
+    private CharacterSheet? GetCharacterSheet(int characterId)
     {
         return characterSheetRepository.Get(characterId);
     }
