@@ -403,7 +403,7 @@ public class HpModifiersLogicTests : HpModifiersTestsBase, IAsyncLifetime
         characterSheet!.CurrentHitPoints.Should().Be(permuations.ExpectedHp);
     }
 
-    public record HpModificatorPermutation(HpModifierModel[] Modifiers, int ExpectedHp, string Description = "")
+    public record HpModificatorPermutation(HpModifierModel[] Modifiers, uint ExpectedHp, string Description = "")
     {
         public override string ToString()
         {

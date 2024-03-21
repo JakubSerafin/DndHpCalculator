@@ -8,8 +8,8 @@ public class CharacterSheetModel
     public long? Id { get; set; }
     public required string Name { get; set; }
     public int Level { get; set; }
-    public int HitPoints { get; set; }
-    public int CurrentHitPoints { get; set; }
+    public uint HitPoints { get; set; }
+    public uint CurrentHitPoints { get; set; }
     public required ClassModel[] Classes { get; set; }
     public required StatsModel Stats { get; set; }
     public ItemModel[]? Items { get; set; }

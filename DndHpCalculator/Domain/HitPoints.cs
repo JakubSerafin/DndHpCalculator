@@ -2,12 +2,12 @@
 
 namespace DND_HP_API.Domain;
 
-public record HitPoints(int Max, CharacterSheet CharacterSheet)
+public record HitPoints(uint Max, CharacterSheet CharacterSheet)
 {
     private readonly List<HpModifier> _hpModifiers = [];
-    public int Max { get; } = Max;
+    public uint Max { get; } = Max;
 
-    public int Current
+    public uint Current
     {
         get
         {

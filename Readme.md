@@ -51,3 +51,5 @@ There are several potential next steps for this project:
 - Automatically detect and update changes in defenses and statistics based on inventory and equipment
 - Add more operations to the API
 - Implement a description feature in HpModificators to allow the Game Master to add descriptions to each modification. Currently, the description is just a placeholder.
+- Swagger schema could be improved to provide more information about the API
+- Better bad request handling - more meaningful error messages

@@ -8,7 +8,7 @@ public class DamageHpModifier : HpModifier
 
     public override HpModifierInnerCalculationStep ModifyLifePool(HpModifierInnerCalculationStep step)
     {
-        var damage = step.CharacterSheetDefenses?.Min(def => def.Reduce(DamageType, Value))??Value;
+        var damage = step.CharacterSheetDefenses.Min(def => def.Reduce(DamageType, Value));
         var remainingDamage = Math.Max(0, damage - step.Temp);
         return step with
         {

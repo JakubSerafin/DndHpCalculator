@@ -8,7 +8,7 @@ namespace DND_HP_API.Infrastructure.DbModels;
 public class HpModifierDbModel
 {
     public long Id { get; init; }
-    public int Value { get; init; }
+    public uint Value { get; init; }
     public required string Type { get; init; }
 
     public string? DamageType { get; init; }
@@ -69,7 +69,7 @@ public class CharacterSheetDbModel
 {
     public required string Name { get; init; }
     public int Level { get; init; }
-    public int HitPoints { get; init; }
+    public uint HitPoints { get; init; }
     public required HpModifierDbModel[] HpModifiers { get; init; }
     public required CharacterClass[] Classes { get; init; }
     public required StatsModel Stats { get; init; }

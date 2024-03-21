@@ -1,17 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DND HP API", "DND HP API\DND HP API.csproj", "{BF892529-DDB3-425C-BCD8-D07F6A69B7BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DndHpCalculator", "DndHpCalculator\DndHpCalculator.csproj", "{BF892529-DDB3-425C-BCD8-D07F6A69B7BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DndHpCalculator.Tests", "DndHpCalculator.Tests\DndHpCalculator.Tests.csproj", "{75FBD439-5C68-42C8-AC43-1F71ECDF6B39}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{BB5DE76C-64F1-4083-B199-C1AA027FCC52}"
-	ProjectSection(SolutionItems) = preProject
-		Docs\ADL\ADL.MD = Docs\ADL\ADL.MD
-		Docs\ADL\ADRs\01_GeneralProjectStructure.md = Docs\ADL\ADRs\01_GeneralProjectStructure.md
-		Docs\ADL\ADRs\02_HpCalculatorShouldBeAComponent.md = Docs\ADL\ADRs\02_HpCalculatorShouldBeAComponent.md
-		Docs\ADL\ADRs\03_EachEndpointShouldHaveHappyPathTested.md = Docs\ADL\ADRs\03_EachEndpointShouldHaveHappyPathTested.md
-		Docs\ADL\ADRs\04_DataAccessShouldBeWrappedInARepository.md = Docs\ADL\ADRs\04_DataAccessShouldBeWrappedInARepository.md
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DnDHpCalculator.Database", "DnDHpCalculator.Database\DnDHpCalculator.Database.csproj", "{4AFE2AEE-F4F1-4A07-8561-9A5571D841CF}"
 EndProject

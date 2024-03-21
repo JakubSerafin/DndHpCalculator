@@ -4,7 +4,7 @@ namespace DND_HP_API.Domain;
 
 public class CharacterSheet : Entity
 {
-    public CharacterSheet(int maxHp)
+    public CharacterSheet(uint maxHp)
     {
         HitPoints = new HitPoints(maxHp, this);
     }
